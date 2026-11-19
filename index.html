@@ -62,26 +62,26 @@
       background: radial-gradient(circle at 50% 35%, var(--bg-accent) 0%, var(--bg-base) 80%);
     }
 
-    .ambient-campus-img {
+.ambient-campus-img {
       position: absolute;
       inset: -3%;
       width: 106%;
       height: 106%;
       object-fit: cover;
       object-position: center 42%;
-      opacity: 0.48;
-      filter: contrast(1.06) saturate(0.85) brightness(0.78);
+      opacity: 0.62;
+      filter: contrast(1.06) saturate(0.92) brightness(0.86);
       transform: scale(1.08);
       transition: opacity 1.4s ease, transform 3.8s cubic-bezier(0.16, 1, 0.3, 1), filter 1.4s ease;
     }
 
     /* 本編移行後は校舎が背景として心地よく沈み、文字の可読性を保つ */
     body.is-revealed .ambient-campus-img {
-      opacity: 0.2;
+      opacity: 0.32;
       transform: scale(1);
-      filter: contrast(1.05) saturate(0.75) brightness(0.65);
+      filter: contrast(1.05) saturate(0.85) brightness(0.75);
     }
-
+    
     /* 写真の境界を消してテーマカラーと融合させるビネット＆グラデーションマスク */
     .ambient-campus::after {
       content: "";
