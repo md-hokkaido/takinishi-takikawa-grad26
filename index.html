@@ -50,11 +50,127 @@
       line-height: 1.6;
     }
 
+    /* オープニング演出用オーバーレイ */
+    .opening-curtain {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: radial-gradient(circle at 50% 50%, var(--bg-accent) 0%, var(--bg-base) 75%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      pointer-events: auto;
+      transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .opening-curtain.is-burst {
+      opacity: 0;
+      transform: scale(1.12);
+      pointer-events: none;
+    }
+
+    .opening-ring {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 1.5px solid var(--gold);
+      box-shadow: 0 0 35px rgba(212, 175, 55, 0.45), inset 0 0 25px rgba(212, 175, 55, 0.25);
+      opacity: 0;
+      transform: scale(0.3);
+      pointer-events: none;
+    }
+
+    .opening-curtain.is-burst .opening-ring {
+      animation: ringExpand 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes ringExpand {
+      0% {
+        opacity: 0.95;
+        transform: scale(0.3);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(14);
+      }
+    }
+
+    .opening-flash {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 248, 225, 0.55) 0%, rgba(212, 175, 55, 0.15) 35%, transparent 70%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .opening-curtain.is-burst .opening-flash {
+      animation: centerFlash 0.75s ease-out forwards;
+    }
+
+    @keyframes centerFlash {
+      0% { opacity: 0; transform: scale(0.2); }
+      30% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.5); }
+    }
+
+    .opening-emblem {
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transform: translateY(10px) scale(0.96);
+      animation: emblemAppear 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
+    }
+
+    .opening-curtain.is-burst .opening-emblem {
+      transform: scale(1.08);
+      opacity: 0;
+      transition: transform 0.5s ease, opacity 0.4s ease;
+    }
+
+    @keyframes emblemAppear {
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .opening-motto {
+      font-family: 'Shippori Mincho', serif;
+      font-size: clamp(1rem, 2.5vw, 1.35rem);
+      letter-spacing: 0.35em;
+      color: var(--gold-light);
+      margin-bottom: 12px;
+      text-shadow: 0 0 18px rgba(212, 175, 55, 0.35);
+    }
+
+    .opening-line {
+      width: 0;
+      height: 1px;
+      margin: 0 auto 14px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      animation: lineGrow 0.7s ease 0.3s forwards;
+    }
+
+    @keyframes lineGrow {
+      to { width: 220px; }
+    }
+
+    .opening-school {
+      font-family: 'Shippori Mincho', serif;
+      font-size: clamp(0.85rem, 2vw, 1rem);
+      letter-spacing: 0.2em;
+      color: var(--text-sub);
+    }
+
     #petal-canvas {
       position: fixed;
       inset: 0;
       pointer-events: none;
-      z-index: 0;
+      z-index: 105;
     }
 
     .wrapper {
@@ -63,7 +179,32 @@
       max-width: 960px;
       margin: 0 auto;
       padding: 48px 20px 32px;
+      transform: scale(0.96);
+      opacity: 0;
+      transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
     }
+
+    body.is-revealed .wrapper {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .reveal-item {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    body.is-revealed .reveal-item {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    body.is-revealed .delay-1 { transition-delay: 0.08s; }
+    body.is-revealed .delay-2 { transition-delay: 0.16s; }
+    body.is-revealed .delay-3 { transition-delay: 0.24s; }
+    body.is-revealed .delay-4 { transition-delay: 0.32s; }
+    body.is-revealed .delay-5 { transition-delay: 0.40s; }
 
     header {
       text-align: center;
@@ -222,7 +363,7 @@
       width: 0%;
       background: linear-gradient(90deg, var(--gold), var(--gold-light));
       border-radius: 99px;
-      transition: width 0.8s ease;
+      transition: width 1.1s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .section-title {
@@ -297,18 +438,29 @@
   </style>
 </head>
 <body data-theme="navy">
+  <!-- オープニング幕 -->
+  <div class="opening-curtain" id="opening-curtain">
+    <div class="opening-flash"></div>
+    <div class="opening-ring"></div>
+    <div class="opening-emblem">
+      <div class="opening-motto" id="opening-motto">志あるものは事ついに成る</div>
+      <div class="opening-line"></div>
+      <div class="opening-school" id="opening-school">北海道滝川西高等学校</div>
+    </div>
+  </div>
+
   <canvas id="petal-canvas"></canvas>
 
   <div class="wrapper">
-    <header>
+    <header class="reveal-item delay-1">
       <div class="school-motto" id="school-motto">志あるものは事ついに成る</div>
       <div class="school-name" id="school-name">北海道滝川西高等学校</div>
       <h1 id="page-title">卒業証書授与式 カウントダウン</h1>
     </header>
 
-    <div class="notice-banner" id="notice-banner"></div>
+    <div class="notice-banner reveal-item delay-2" id="notice-banner"></div>
 
-    <div class="stats-grid">
+    <div class="stats-grid reveal-item delay-2">
       <div class="card stat-card">
         <div class="stat-label">卒業式まで あと</div>
         <div>
@@ -328,7 +480,7 @@
       </div>
     </div>
 
-    <div class="card clock-bar">
+    <div class="card clock-bar reveal-item delay-3">
       <div class="clock-item">
         <span id="rem-hours">00</span>
         <small>HOURS</small>
@@ -343,7 +495,7 @@
       </div>
     </div>
 
-    <div class="card progress-section">
+    <div class="card progress-section reveal-item delay-4">
       <div class="progress-header">
         <span>3年次 始業式からの経過</span>
         <strong id="progress-percent">0.0%</strong>
@@ -353,7 +505,7 @@
       </div>
     </div>
 
-    <div class="card">
+    <div class="card reveal-item delay-5">
       <div class="section-title">
         <span>今後の主な学年日程</span>
         <small style="font-family: 'Noto Sans JP', sans-serif; font-size: 0.75rem; color: var(--text-sub);">令和8年度 年間行事予定</small>
@@ -361,7 +513,7 @@
       <ul class="event-list" id="event-list"></ul>
     </div>
 
-　　<footer>
+    <footer class="reveal-item delay-5">
       <p id="sync-status" style="margin-bottom: 6px;"></p>
       <a href="/adm.html">管理画面</a>
     </footer>
@@ -407,6 +559,8 @@
     };
 
     let config = structuredClone(DEFAULT_CONFIG);
+    let burstParticles = [];
+    let isOpened = false;
 
     function parseLocalDate(str) {
       const [y, m, d] = str.split("-").map(Number);
@@ -459,6 +613,8 @@
       document.body.dataset.theme = config.theme || "navy";
       document.getElementById("school-motto").textContent = config.schoolMotto;
       document.getElementById("school-name").textContent = config.schoolName;
+      document.getElementById("opening-motto").textContent = config.schoolMotto;
+      document.getElementById("opening-school").textContent = config.schoolName;
       document.getElementById("page-title").textContent = config.pageTitle;
       document.getElementById("notice-banner").textContent = config.notice || "";
       document.getElementById("grad-date-text").textContent = `${formatJPDate(config.graduationDate)} 挙行`;
@@ -515,12 +671,51 @@
         document.getElementById("school-days-left").textContent = countRemainingSchoolDays(now);
       }
 
-      const start = parseLocalDate(config.startDate);
-      const totalSpan = gradDate - start;
-      const elapsed = now - start;
-      const pct = Math.min(100, Math.max(0, (elapsed / totalSpan) * 100));
-      document.getElementById("progress-percent").textContent = `${pct.toFixed(1)}%`;
-      document.getElementById("progress-fill").style.width = `${pct}%`;
+      if (isOpened) {
+        const start = parseLocalDate(config.startDate);
+        const totalSpan = gradDate - start;
+        const elapsed = now - start;
+        const pct = Math.min(100, Math.max(0, (elapsed / totalSpan) * 100));
+        document.getElementById("progress-percent").textContent = `${pct.toFixed(1)}%`;
+        document.getElementById("progress-fill").style.width = `${pct}%`;
+      }
+    }
+
+    function triggerOpeningBurst() {
+      if (isOpened) return;
+      isOpened = true;
+
+      const curtain = document.getElementById("opening-curtain");
+      const canvas = document.getElementById("petal-canvas");
+      curtain.classList.add("is-burst");
+      document.body.classList.add("is-revealed");
+
+      // 中央から放射状に光の粒と花びらを弾けさせる
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      for (let i = 0; i < 65; i++) {
+        const angle = (Math.PI * 2 * i) / 65 + (Math.random() - 0.5) * 0.2;
+        const speed = 3.5 + Math.random() * 9.5;
+        burstParticles.push({
+          x: cx,
+          y: cy,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          r: 2.5 + Math.random() * 4.5,
+          alpha: 1,
+          decay: 0.014 + Math.random() * 0.012,
+          isGold: Math.random() > 0.35,
+          angle: Math.random() * Math.PI * 2,
+          spin: (Math.random() - 0.5) * 0.12
+        });
+      }
+
+      updateTick();
+
+      setTimeout(() => {
+        curtain.style.display = "none";
+        canvas.style.zIndex = "0";
+      }, 900);
     }
 
     async function loadRemoteConfig() {
@@ -537,14 +732,15 @@
           }
         }
       } catch (_) {
-        // ローカルプレビュー時などはデフォルト設定を使用
+        // オフライン・ローカル環境はデフォルト設定を使用
       } finally {
         applyConfigToDOM();
         updateTick();
+        setTimeout(triggerOpeningBurst, 1150);
       }
     }
 
-    function initPetals() {
+    function initCanvas() {
       const canvas = document.getElementById("petal-canvas");
       const ctx = canvas.getContext("2d");
       let w = canvas.width = window.innerWidth;
@@ -567,6 +763,8 @@
 
       function draw() {
         ctx.clearRect(0, 0, w, h);
+
+        // 常時舞う桜の花びら
         for (const p of petals) {
           p.y += p.vy;
           p.x += p.vx + Math.sin(p.angle) * 0.3;
@@ -578,18 +776,49 @@
           ctx.save();
           ctx.translate(p.x, p.y);
           ctx.rotate(p.angle);
-          ctx.fillStyle = "rgba(255, 224, 232, 0.28)";
+          ctx.fillStyle = "rgba(255, 224, 232, 0.26)";
           ctx.beginPath();
           ctx.ellipse(0, 0, p.r, p.r * 0.55, 0, 0, Math.PI * 2);
           ctx.fill();
           ctx.restore();
         }
+
+        // オープニングで弾ける光のパーティクル
+        for (let i = burstParticles.length - 1; i >= 0; i--) {
+          const b = burstParticles[i];
+          b.x += b.vx;
+          b.y += b.vy;
+          b.vx *= 0.96;
+          b.vy *= 0.96;
+          b.vy += 0.04;
+          b.angle += b.spin;
+          b.alpha -= b.decay;
+
+          if (b.alpha <= 0) {
+            burstParticles.splice(i, 1);
+            continue;
+          }
+
+          ctx.save();
+          ctx.translate(b.x, b.y);
+          ctx.rotate(b.angle);
+          ctx.fillStyle = b.isGold
+            ? `rgba(243, 229, 171, ${b.alpha})`
+            : `rgba(255, 214, 226, ${b.alpha})`;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, b.r, b.r * 0.55, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
         requestAnimationFrame(draw);
       }
       draw();
     }
 
-    initPetals();
+    document.getElementById("opening-curtain").addEventListener("click", triggerOpeningBurst);
+
+    initCanvas();
     loadRemoteConfig();
     setInterval(updateTick, 1000);
   </script>
