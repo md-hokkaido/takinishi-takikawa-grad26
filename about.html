@@ -6,7 +6,7 @@
   <title>このサイトについて | 卒業への軌跡 ― 旅立ちのカウントダウン</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@500;700&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@500;700&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-base: #0a101d;
@@ -179,6 +179,27 @@
       font-weight: 700;
     }
 
+    .ai-badge-box {
+      background: rgba(212, 175, 55, 0.08);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .ai-model-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--gold-light);
+    }
+
     .domain-box {
       background: rgba(212, 175, 55, 0.08);
       border: 1px solid var(--card-border);
@@ -263,6 +284,14 @@
       font-size: 0.78rem;
       color: var(--text-sub);
     }
+
+    .ai-credit {
+      margin-top: 6px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      opacity: 0.75;
+    }
   </style>
 </head>
 <body data-theme="navy">
@@ -284,6 +313,21 @@
       <p>
         学校の年間行事予定表をもとに、土日祝日や夏季・冬季休業、3年生の家庭学習期間などを除いた実際の登校日数を自動計算しています。行事予定の変更や臨時登校日が追加された場合も、最新のスケジュールがすべての端末へ即座に反映される仕組みを備えています。
       </p>
+    </section>
+
+    <section class="card">
+      <h2>サイトの制作・AIモデルの活用について</h2>
+      <p>
+        本サイトの画面デザイン、アニメーション演出、カウントダウン計算プログラム、およびクラウド同期システムの構築には、Google の生成AIモデル「Gemini」を活用しています。
+      </p>
+      <div class="ai-badge-box">
+        <span class="ai-model-title">Created by Google Gemini</span>
+        <span class="domain-tag">AI支援によるWeb開発</span>
+      </div>
+      <ul class="info-list">
+        <li><strong>開発プロセス：</strong>サイト管理者が企画・要件定義・年間行事予定の設計を行い、対話型AIモデル（Gemini）と協働してHTML / CSS / JavaScript およびサーバーレスAPIのコードを生成・実装しています。</li>
+        <li><strong>情報の正確性と管理体制：</strong>AIによって生成されたプログラムをもとに、サイト管理者が年間行事予定表との照合・動作検証・公開管理を行っています。なお、閲覧者の操作内容がAIの学習データに送信されることはありません。</li>
+      </ul>
     </section>
 
     <section class="card">
@@ -330,7 +374,8 @@
 
     <footer>
       <p id="school-footer">北海道滝川西高等学校 令和8年度 卒業カウントダウン</p>
-      <p style="margin-top: 4px;">Created by 【前田　将弥 ／ Masaya Maeda】</p>
+      <p style="margin-top: 4px;">Site Management by 【前田　将弥 ／ Masaya Maeda】</p>
+      <p class="ai-credit">Created by Google Gemini</p>
     </footer>
   </div>
 
