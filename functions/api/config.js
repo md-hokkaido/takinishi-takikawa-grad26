@@ -1,10 +1,13 @@
 const DEFAULT_USERS = [
-  { id: "system_administrator", password: "RMYh2411", label: "システム管理者" }
+  { id: "system_administrator", password: "RMYh2411", label: "システム管理者", role: "admin" }
 ];
 
 function getUsers(data) {
   if (Array.isArray(data.adminUsers) && data.adminUsers.length > 0) {
-    return data.adminUsers;
+    return data.adminUsers.map(u => ({
+      ...u,
+      role: u.role === "album_editor" ? "album_editor" : "admin"
+    }));
   }
   return DEFAULT_USERS;
 }
@@ -56,11 +59,50 @@ export async function onRequestPost({ request, env }) {
     return Response.json({ error: "ユーザーIDまたはパスワードが正しくありません" }, { status: 401 });
   }
 
-  if (body.action === "login") {
-    const safeUsers = users.map(u => ({ id: u.id, label: u.label || u.id }));
+  // アルバムページからのログイン（全体管理者・アルバム編集者の両方許可）
+  if (body.action === "album_login") {
     return Response.json({
       ok: true,
-      currentUser: { id: authUser.id, label: authUser.label || authUser.id },
+      currentUser: {
+        id: authUser.id,
+        label: authUser.label || authUser.id,
+        role: authUser.role
+      }
+    });
+  }
+
+  // アルバムページからの投稿・編集・削除保存（全体管理者・アルバム編集者の両方許可）
+  if (body.action === "save_album") {
+    if (!Array.isArray(body.albumPhotos)) {
+      return Response.json({ error: "アルバムデータが不正です" }, { status: 400 });
+    }
+
+    const updatedData = {
+      ...currentData,
+      albumPhotos: body.albumPhotos,
+      adminUsers: users,
+      updatedAt: new Date().toISOString()
+    };
+    delete updatedData.passcode;
+
+    await env.GRADUATION_KV.put("site_config", JSON.stringify(updatedData));
+    return Response.json({ ok: true, updatedAt: updatedData.updatedAt });
+  }
+
+  // これ以降は「サイト全体管理者（admin）」のみ許可
+  if (authUser.role !== "admin") {
+    return Response.json({ error: "この操作を行う権限がありません（サイト全体管理者専用）" }, { status: 403 });
+  }
+
+  if (body.action === "login") {
+    const safeUsers = users.map(u => ({
+      id: u.id,
+      label: u.label || u.id,
+      role: u.role
+    }));
+    return Response.json({
+      ok: true,
+      currentUser: { id: authUser.id, label: authUser.label || authUser.id, role: authUser.role },
       users: safeUsers
     });
   }
@@ -72,6 +114,7 @@ export async function onRequestPost({ request, env }) {
       const newId = String(body.newUserId || "").trim();
       const newPass = String(body.newPassword || "").trim();
       const newLabel = String(body.newLabel || "").trim() || newId;
+      const newRole = body.newRole === "album_editor" ? "album_editor" : "admin";
 
       if (!newId || !newPass) {
         return Response.json({ error: "ユーザーIDとパスワードを入力してください" }, { status: 400 });
@@ -83,11 +126,14 @@ export async function onRequestPost({ request, env }) {
         return Response.json({ error: "このユーザーIDはすでに登録されています" }, { status: 400 });
       }
 
-      nextUsers.push({ id: newId, password: newPass, label: newLabel });
+      nextUsers.push({ id: newId, password: newPass, label: newLabel, role: newRole });
     } else if (body.subAction === "delete") {
       const targetId = String(body.targetUserId || "");
-      if (nextUsers.length <= 1) {
-        return Response.json({ error: "最後の管理者アカウントは削除できません" }, { status: 400 });
+      const targetUser = nextUsers.find(u => u.id === targetId);
+      const adminCount = nextUsers.filter(u => u.role === "admin").length;
+
+      if (targetUser && targetUser.role === "admin" && adminCount <= 1) {
+        return Response.json({ error: "最後のサイト全体管理者は削除できません" }, { status: 400 });
       }
       nextUsers = nextUsers.filter(u => u.id !== targetId);
     } else if (body.subAction === "change_password") {
@@ -108,10 +154,15 @@ export async function onRequestPost({ request, env }) {
 
     await env.GRADUATION_KV.put("site_config", JSON.stringify(updatedData));
 
-    const safeUsers = nextUsers.map(u => ({ id: u.id, label: u.label || u.id }));
+    const safeUsers = nextUsers.map(u => ({
+      id: u.id,
+      label: u.label || u.id,
+      role: u.role
+    }));
     return Response.json({ ok: true, users: safeUsers });
   }
 
+  // サイト全体設定の保存
   const nextConfig = {
     ...body.config,
     adminUsers: users,
