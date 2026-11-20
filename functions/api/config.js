@@ -1,13 +1,12 @@
 const DEFAULT_USERS = [
-  { id: "admin", password: "takikawa2026", label: "初期管理者" }
+  { id: "system_administrator", password: "RMYh2411", label: "システム管理者" }
 ];
 
 function getUsers(data) {
   if (Array.isArray(data.adminUsers) && data.adminUsers.length > 0) {
     return data.adminUsers;
   }
-  const fallbackPass = data.passcode || "takikawa2026";
-  return [{ id: "admin", password: fallbackPass, label: "初期管理者" }];
+  return DEFAULT_USERS;
 }
 
 function authenticate(users, userId, password) {
@@ -30,7 +29,6 @@ export async function onRequestGet({ env }) {
     });
   }
 
-  // 公開GETリクエストには認証情報を一切含めない
   const parsed = JSON.parse(raw);
   delete parsed.passcode;
   delete parsed.adminUsers;
@@ -58,7 +56,6 @@ export async function onRequestPost({ request, env }) {
     return Response.json({ error: "ユーザーIDまたはパスワードが正しくありません" }, { status: 401 });
   }
 
-  // アクション1: ログイン認証チェックとユーザー一覧の取得
   if (body.action === "login") {
     const safeUsers = users.map(u => ({ id: u.id, label: u.label || u.id }));
     return Response.json({
@@ -68,7 +65,6 @@ export async function onRequestPost({ request, env }) {
     });
   }
 
-  // アクション2: ユーザーアカウントの追加・更新・削除
   if (body.action === "manage_users") {
     let nextUsers = [...users];
 
@@ -116,7 +112,6 @@ export async function onRequestPost({ request, env }) {
     return Response.json({ ok: true, users: safeUsers });
   }
 
-  // アクション3: サイト設定の保存（既存のユーザー一覧は維持する）
   const nextConfig = {
     ...body.config,
     adminUsers: users,
