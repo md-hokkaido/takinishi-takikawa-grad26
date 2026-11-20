@@ -86,12 +86,45 @@
       z-index: 1;
       max-width: 1080px;
       margin: 0 auto;
-      padding: 48px 20px 44px;
+      padding: 36px 20px 44px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .editor-chip {
+      font-size: 0.78rem;
+      padding: 5px 12px;
+      border-radius: 99px;
+      background: rgba(212, 175, 55, 0.2);
+      border: 1px solid var(--gold);
+      color: var(--gold-light);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--text-sub);
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--gold);
+      color: var(--gold-light);
     }
 
     header {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 36px;
     }
 
     .sub-en {
@@ -119,6 +152,87 @@
       color: var(--text-sub);
     }
 
+    /* 編集者専用投稿パネル */
+    .composer-card {
+      background: var(--card-bg);
+      border: 1px solid var(--gold);
+      backdrop-filter: blur(16px);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 32px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+      display: none;
+    }
+
+    .composer-card.is-visible {
+      display: block;
+    }
+
+    .composer-title {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1.15rem;
+      color: var(--gold-light);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 180px;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--gold-light);
+      margin-bottom: 4px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(8, 12, 24, 0.75);
+      color: #fff;
+      font-size: 0.9rem;
+      font-family: inherit;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold), #b89228);
+      color: #0a101d;
+      font-weight: 700;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn-gold:hover {
+      opacity: 0.9;
+    }
+
     .album-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -132,14 +246,14 @@
       border-radius: 14px;
       overflow: hidden;
       box-shadow: 0 14px 36px rgba(0, 0, 0, 0.42);
-      cursor: pointer;
-      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease, box-shadow 0.35s ease;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease;
     }
 
     .photo-card:hover {
-      transform: translateY(-6px);
+      transform: translateY(-5px);
       border-color: var(--gold);
-      box-shadow: 0 20px 44px rgba(0, 0, 0, 0.58);
     }
 
     .photo-thumb-wrap {
@@ -148,6 +262,7 @@
       aspect-ratio: 16 / 10;
       overflow: hidden;
       background: rgba(0, 0, 0, 0.35);
+      cursor: pointer;
     }
 
     .photo-thumb-wrap img {
@@ -163,6 +278,9 @@
 
     .photo-body {
       padding: 18px 20px 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     .photo-date {
@@ -180,12 +298,45 @@
       font-weight: 700;
       color: #ffffff;
       margin-bottom: 8px;
+      cursor: pointer;
     }
 
     .photo-caption {
       font-size: 0.86rem;
       color: var(--text-sub);
       line-height: 1.65;
+    }
+
+    .photo-author {
+      margin-top: 10px;
+      font-size: 0.74rem;
+      color: var(--text-sub);
+      opacity: 0.75;
+    }
+
+    .photo-admin-actions {
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .btn-mini {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .btn-mini.danger {
+      border-color: rgba(248, 113, 113, 0.5);
+      background: rgba(220, 38, 38, 0.25);
+      color: #fecaca;
     }
 
     .empty-state {
@@ -197,12 +348,12 @@
       color: var(--text-sub);
     }
 
-    /* ライトボックス（拡大表示モーダル） */
-    .lightbox {
+    /* モーダル共通（ログイン＆拡大表示） */
+    .modal-overlay {
       position: fixed;
       inset: 0;
       z-index: 300;
-      background: rgba(6, 10, 18, 0.92);
+      background: rgba(6, 10, 18, 0.9);
       backdrop-filter: blur(12px);
       display: none;
       align-items: center;
@@ -210,8 +361,17 @@
       padding: 20px;
     }
 
-    .lightbox.is-open {
+    .modal-overlay.is-open {
       display: flex;
+    }
+
+    .login-modal-box {
+      max-width: 380px;
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 26px;
     }
 
     .lightbox-inner {
@@ -253,15 +413,6 @@
       color: #fff;
       font-size: 1.2rem;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s, border-color 0.2s;
-    }
-
-    .lb-nav:hover {
-      background: rgba(212, 175, 55, 0.35);
-      border-color: var(--gold);
     }
 
     .lb-prev { left: 14px; }
@@ -332,11 +483,50 @@
   </div>
 
   <div class="wrapper">
+    <!-- 右上の編集者ログイン／状態バー -->
+    <div class="top-bar">
+      <span class="editor-chip" id="editor-status-chip" style="display: none;"></span>
+      <button class="btn-ghost" id="open-login-btn">編集者ログイン</button>
+      <button class="btn-ghost" id="logout-btn" style="display: none;">ログアウト</button>
+    </div>
+
     <header>
       <div class="sub-en">Memory Gallery</div>
       <h1>思い出のアルバム</h1>
       <p class="header-desc" id="school-sub">北海道滝川西高等学校 令和8年度 卒業記念アーカイブ</p>
     </header>
+
+    <!-- ログイン済み編集者・管理者のみに表示される新規投稿・編集パネル -->
+    <section class="composer-card" id="composer-card">
+      <h2 class="composer-title" id="composer-heading">新しい思い出を投稿する</h2>
+      <div class="form-grid">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label>タイトル *</label>
+          <input type="text" class="form-input" id="post-title" placeholder="例: 学校祭・クラス合唱">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label>日付・時期</label>
+          <input type="text" class="form-input" id="post-date" placeholder="例: 2026.07.18">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>写真を選択（スマホ・PCから直接選択）または画像パス・URLを入力 *</label>
+        <input type="file" accept="image/*" id="post-file" class="form-input" style="margin-bottom: 8px; padding: 6px;">
+        <input type="text" class="form-input" id="post-src" placeholder="直接ファイル選択した場合は自動入力されます（例: ./photo1.jpg）">
+      </div>
+
+      <div class="form-group">
+        <label>思い出のコメント・エピソード</label>
+        <textarea class="form-input" id="post-caption" rows="2" placeholder="その時の出来事やメッセージを入力"></textarea>
+      </div>
+
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <button class="btn-gold" id="submit-post-btn">アルバムに投稿・保存する</button>
+        <button class="btn-ghost" id="cancel-edit-btn" style="display: none;">編集をキャンセル</button>
+        <span id="post-feedback" style="font-size: 0.84rem; color: var(--gold-light);"></span>
+      </div>
+    </section>
 
     <div class="album-grid" id="album-grid"></div>
 
@@ -350,8 +540,28 @@
     </footer>
   </div>
 
-  <!-- 拡大表示モーダル -->
-  <div class="lightbox" id="lightbox">
+  <!-- 編集者ログインモーダル -->
+  <div class="modal-overlay" id="login-modal">
+    <div class="login-modal-box">
+      <h2 style="font-family: 'Shippori Mincho', serif; font-size: 1.2rem; color: var(--gold-light); margin-bottom: 8px;">アルバム編集者ログイン</h2>
+      <p style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 14px;">
+        許可された編集者または管理者のID・パスワードを入力してください。
+      </p>
+      <div class="form-group">
+        <input type="text" class="form-input" id="album-user-id" placeholder="ユーザ名" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <input type="password" class="form-input" id="album-user-pass" placeholder="パスワード" autocomplete="current-password">
+      </div>
+      <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px;">
+        <button class="btn-ghost" id="close-login-btn">閉じる</button>
+        <button class="btn-gold" id="do-album-login-btn">ログイン</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 拡大表示ライトボックス -->
+  <div class="modal-overlay" id="lightbox">
     <div class="lightbox-inner">
       <button class="lb-close" id="lb-close" aria-label="閉じる">×</button>
       <div class="lightbox-img-box">
@@ -361,7 +571,7 @@
       </div>
       <div class="lightbox-info">
         <div class="photo-date" id="lb-date"></div>
-        <div class="photo-title" id="lb-title"></div>
+        <div class="photo-title" id="lb-title" style="cursor: default;"></div>
         <div class="photo-caption" id="lb-caption"></div>
       </div>
     </div>
@@ -373,12 +583,58 @@
         src: "./DSC08109.jpg",
         date: "2026.04",
         title: "3年次のスタート・学び舎の風景",
-        caption: "澄み渡る青空のもと、高校生活最後の1年が始まりました。"
+        caption: "澄み渡る青空のもと、高校生活最後の1年が始まりました。",
+        author: "システム管理者"
       }
     ];
 
     let photos = [...DEFAULT_ALBUM];
     let currentIndex = 0;
+    let editorSession = null; // { id, password, label, role }
+    let editingIdx = -1;
+
+    // 画像ファイルを読み込み、軽量なJPEGデータURLに自動圧縮する（KV容量節約のため）
+    function compressImageFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const maxW = 1280;
+            let w = img.width;
+            let h = img.height;
+            if (w > maxW) {
+              h = Math.round((h * maxW) / w);
+              w = maxW;
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL("image/jpeg", 0.78));
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    document.getElementById("post-file").addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const feedback = document.getElementById("post-feedback");
+      feedback.textContent = "画像を最適化しています...";
+      try {
+        const dataUrl = await compressImageFile(file);
+        document.getElementById("post-src").value = dataUrl;
+        feedback.textContent = "画像の準備が完了しました。";
+      } catch (_) {
+        feedback.textContent = "画像の読み込みに失敗しました。";
+      }
+    });
 
     function renderGrid() {
       const grid = document.getElementById("album-grid");
@@ -400,13 +656,195 @@
             <div class="photo-date">${p.date || ""}</div>
             <h2 class="photo-title">${p.title || "思い出の1枚"}</h2>
             <p class="photo-caption">${p.caption || ""}</p>
+            ${p.author ? `<div class="photo-author">投稿者: ${p.author}</div>` : ""}
+            ${editorSession ? `
+              <div class="photo-admin-actions">
+                <button class="btn-mini" data-action="edit">編集</button>
+                <button class="btn-mini danger" data-action="delete">削除</button>
+              </div>
+            ` : ""}
           </div>
         `;
-        card.addEventListener("click", () => openLightbox(idx));
+
+        card.querySelector(".photo-thumb-wrap").addEventListener("click", () => openLightbox(idx));
+        card.querySelector(".photo-title").addEventListener("click", () => openLightbox(idx));
+
+        if (editorSession) {
+          card.querySelector('[data-action="edit"]').addEventListener("click", () => startEdit(idx));
+          card.querySelector('[data-action="delete"]').addEventListener("click", () => deletePhoto(idx));
+        }
+
         grid.appendChild(card);
       });
     }
 
+    function resetComposer() {
+      editingIdx = -1;
+      document.getElementById("composer-heading").textContent = "新しい思い出を投稿する";
+      document.getElementById("submit-post-btn").textContent = "アルバムに投稿・保存する";
+      document.getElementById("cancel-edit-btn").style.display = "none";
+      document.getElementById("post-title").value = "";
+      document.getElementById("post-date").value = "";
+      document.getElementById("post-src").value = "";
+      document.getElementById("post-file").value = "";
+      document.getElementById("post-caption").value = "";
+    }
+
+    function startEdit(idx) {
+      const p = photos[idx];
+      if (!p) return;
+      editingIdx = idx;
+      document.getElementById("composer-heading").textContent = "投稿内容を編集中";
+      document.getElementById("submit-post-btn").textContent = "変更内容を保存する";
+      document.getElementById("cancel-edit-btn").style.display = "inline-block";
+      document.getElementById("post-title").value = p.title || "";
+      document.getElementById("post-date").value = p.date || "";
+      document.getElementById("post-src").value = p.src || "";
+      document.getElementById("post-caption").value = p.caption || "";
+      document.getElementById("composer-card").scrollIntoView({ behavior: "smooth" });
+    }
+
+    document.getElementById("cancel-edit-btn").addEventListener("click", resetComposer);
+
+    async function syncAlbumToCloud(nextPhotos, msg) {
+      if (!editorSession) return false;
+      const feedback = document.getElementById("post-feedback");
+      feedback.textContent = "保存中...";
+
+      try {
+        const res = await fetch("/api/config", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "save_album",
+            userId: editorSession.id,
+            password: editorSession.password,
+            albumPhotos: nextPhotos
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          feedback.textContent = data.error || "保存に失敗しました。";
+          return false;
+        }
+        photos = nextPhotos;
+        renderGrid();
+        feedback.textContent = msg;
+        return true;
+      } catch (_) {
+        feedback.textContent = "通信エラーが発生しました。";
+        return false;
+      }
+    }
+
+    document.getElementById("submit-post-btn").addEventListener("click", async () => {
+      const title = document.getElementById("post-title").value.trim();
+      const date = document.getElementById("post-date").value.trim();
+      const src = document.getElementById("post-src").value.trim();
+      const caption = document.getElementById("post-caption").value.trim();
+
+      if (!title || !src) {
+        alert("タイトルと写真（ファイル選択または画像パス）を入力してください。");
+        return;
+      }
+
+      const nextPhotos = [...photos];
+      if (editingIdx >= 0) {
+        nextPhotos[editingIdx] = {
+          ...nextPhotos[editingIdx],
+          title,
+          date,
+          src,
+          caption
+        };
+        const ok = await syncAlbumToCloud(nextPhotos, "投稿を更新しました。");
+        if (ok) resetComposer();
+      } else {
+        nextPhotos.unshift({
+          src,
+          date,
+          title,
+          caption,
+          author: editorSession.label
+        });
+        const ok = await syncAlbumToCloud(nextPhotos, "新しい思い出を投稿しました！");
+        if (ok) resetComposer();
+      }
+    });
+
+    async function deletePhoto(idx) {
+      if (!confirm("この思い出を削除しますか？")) return;
+      const nextPhotos = photos.filter((_, i) => i !== idx);
+      await syncAlbumToCloud(nextPhotos, "削除しました。");
+    }
+
+    // ログインモーダル操作
+    document.getElementById("open-login-btn").addEventListener("click", () => {
+      document.getElementById("login-modal").classList.add("is-open");
+    });
+
+    document.getElementById("close-login-btn").addEventListener("click", () => {
+      document.getElementById("login-modal").classList.remove("is-open");
+    });
+
+    document.getElementById("do-album-login-btn").addEventListener("click", async () => {
+      const userId = document.getElementById("album-user-id").value.trim();
+      const password = document.getElementById("album-user-pass").value.trim();
+      if (!userId || !password) {
+        alert("ユーザ名とパスワードを入力してください。");
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/config", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "album_login",
+            userId,
+            password
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "ログインに失敗しました。");
+          return;
+        }
+
+        editorSession = {
+          id: userId,
+          password,
+          label: data.currentUser.label,
+          role: data.currentUser.role
+        };
+
+        document.getElementById("login-modal").classList.remove("is-open");
+        document.getElementById("open-login-btn").style.display = "none";
+        document.getElementById("logout-btn").style.display = "inline-block";
+
+        const roleLabel = editorSession.role === "admin" ? "全体管理者" : "アルバム編集者";
+        const chip = document.getElementById("editor-status-chip");
+        chip.textContent = `${editorSession.label}（${roleLabel}）`;
+        chip.style.display = "inline-block";
+
+        document.getElementById("composer-card").classList.add("is-visible");
+        renderGrid();
+      } catch (_) {
+        alert("通信エラーが発生しました。");
+      }
+    });
+
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      editorSession = null;
+      resetComposer();
+      document.getElementById("composer-card").classList.remove("is-visible");
+      document.getElementById("editor-status-chip").style.display = "none";
+      document.getElementById("logout-btn").style.display = "none";
+      document.getElementById("open-login-btn").style.display = "inline-block";
+      renderGrid();
+    });
+
+    // ライトボックス操作
     function openLightbox(idx) {
       currentIndex = idx;
       updateLightbox();
@@ -470,7 +908,7 @@
             document.getElementById("school-sub").textContent = `${remote.schoolName} 令和8年度 卒業記念アーカイブ`;
             document.getElementById("school-footer").textContent = `${remote.schoolName} 令和8年度 卒業カウントダウン`;
           }
-          if (remote && Array.isArray(remote.albumPhotos) && remote.albumPhotos.length > 0) {
+          if (remote && Array.isArray(remote.albumPhotos)) {
             photos = remote.albumPhotos;
           }
         }
