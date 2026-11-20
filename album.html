@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>思い出のアルバム | 卒業への軌跡 ― 旅立ちのカウントダウン</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Sans+JP:wght@400;500;700&family=Plus+Jakarta+Sans:wght@600;700&family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #0a101d;
+      --bg-accent: #1d1427;
+      --gold: #d4af37;
+      --gold-light: #f3e5ab;
+      --text-main: #f4f5f7;
+      --text-sub: #b4becd;
+      --card-bg: rgba(13, 20, 36, 0.72);
+      --card-border: rgba(212, 175, 55, 0.28);
+    }
+
+    body[data-theme="sakura"] {
+      --bg-base: #1b1018;
+      --bg-accent: #341728;
+      --gold: #f2a6b8;
+      --gold-light: #ffe0e8;
+      --card-bg: rgba(31, 16, 26, 0.72);
+      --card-border: rgba(242, 166, 184, 0.32);
+    }
+
+    body[data-theme="emerald"] {
+      --bg-base: #091615;
+      --bg-accent: #112926;
+      --gold: #c5a86a;
+      --gold-light: #efe3c2;
+      --card-bg: rgba(11, 25, 24, 0.72);
+      --card-border: rgba(197, 168, 106, 0.32);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.75;
+    }
+
+    .ambient-campus {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 35%, var(--bg-accent) 0%, var(--bg-base) 80%);
+    }
+
+    .ambient-campus-img {
+      position: absolute;
+      inset: -3%;
+      width: 106%;
+      height: 106%;
+      object-fit: cover;
+      object-position: center 42%;
+      opacity: 0.28;
+      filter: contrast(1.05) saturate(0.85) brightness(0.72);
+    }
+
+    .ambient-campus::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 45%, rgba(10, 16, 29, 0.3) 0%, var(--bg-base) 88%),
+        linear-gradient(180deg, rgba(10, 16, 29, 0.6) 0%, rgba(10, 16, 29, 0.25) 45%, var(--bg-base) 96%);
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 48px 20px 44px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .sub-en {
+      font-family: 'Cinzel', serif;
+      font-size: 0.88rem;
+      letter-spacing: 0.34em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-family: 'Shippori Mincho', serif;
+      font-size: clamp(1.7rem, 4vw, 2.5rem);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      background: linear-gradient(135deg, #fff 20%, var(--gold-light) 60%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .header-desc {
+      font-size: 0.9rem;
+      color: var(--text-sub);
+    }
+
+    .album-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .photo-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(14px);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.42);
+      cursor: pointer;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease, box-shadow 0.35s ease;
+    }
+
+    .photo-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--gold);
+      box-shadow: 0 20px 44px rgba(0, 0, 0, 0.58);
+    }
+
+    .photo-thumb-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    .photo-thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .photo-card:hover .photo-thumb-wrap img {
+      transform: scale(1.06);
+    }
+
+    .photo-body {
+      padding: 18px 20px 20px;
+    }
+
+    .photo-date {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .photo-title {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .photo-caption {
+      font-size: 0.86rem;
+      color: var(--text-sub);
+      line-height: 1.65;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      color: var(--text-sub);
+    }
+
+    /* ライトボックス（拡大表示モーダル） */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: rgba(6, 10, 18, 0.92);
+      backdrop-filter: blur(12px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .lightbox.is-open {
+      display: flex;
+    }
+
+    .lightbox-inner {
+      max-width: 920px;
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
+      position: relative;
+    }
+
+    .lightbox-img-box {
+      position: relative;
+      background: #05080f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-height: 68vh;
+      overflow: hidden;
+    }
+
+    .lightbox-img-box img {
+      max-width: 100%;
+      max-height: 68vh;
+      object-fit: contain;
+    }
+
+    .lb-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(10, 16, 29, 0.65);
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .lb-nav:hover {
+      background: rgba(212, 175, 55, 0.35);
+      border-color: var(--gold);
+    }
+
+    .lb-prev { left: 14px; }
+    .lb-next { right: 14px; }
+
+    .lb-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 5;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(10, 16, 29, 0.75);
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .lightbox-info {
+      padding: 20px 24px;
+    }
+
+    .back-area {
+      text-align: center;
+      margin-top: 44px;
+    }
+
+    .btn-back {
+      display: inline-block;
+      padding: 11px 28px;
+      border-radius: 99px;
+      border: 1px solid var(--gold);
+      background: rgba(212, 175, 55, 0.12);
+      color: var(--gold-light);
+      text-decoration: none;
+      font-family: 'Shippori Mincho', serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.1em;
+      transition: background 0.25s ease, transform 0.2s ease;
+    }
+
+    .btn-back:hover {
+      background: rgba(212, 175, 55, 0.25);
+      transform: translateY(-1px);
+    }
+
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-sub);
+    }
+
+    .ai-credit {
+      margin-top: 6px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      opacity: 0.75;
+    }
+  </style>
+</head>
+<body data-theme="navy">
+  <div class="ambient-campus" aria-hidden="true">
+    <img src="./DSC08109.jpg" alt="" class="ambient-campus-img" id="campus-bg-img">
+  </div>
+
+  <div class="wrapper">
+    <header>
+      <div class="sub-en">Memory Gallery</div>
+      <h1>思い出のアルバム</h1>
+      <p class="header-desc" id="school-sub">北海道滝川西高等学校 令和8年度 卒業記念アーカイブ</p>
+    </header>
+
+    <div class="album-grid" id="album-grid"></div>
+
+    <div class="back-area">
+      <a href="/" class="btn-back">カウントダウン画面へ戻る</a>
+    </div>
+
+    <footer>
+      <p id="school-footer">北海道滝川西高等学校 令和8年度 卒業カウントダウン</p>
+      <p class="ai-credit">Created by Google Gemini</p>
+    </footer>
+  </div>
+
+  <!-- 拡大表示モーダル -->
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-inner">
+      <button class="lb-close" id="lb-close" aria-label="閉じる">×</button>
+      <div class="lightbox-img-box">
+        <button class="lb-nav lb-prev" id="lb-prev" aria-label="前の写真">‹</button>
+        <img src="" alt="" id="lb-img">
+        <button class="lb-nav lb-next" id="lb-next" aria-label="次の写真">›</button>
+      </div>
+      <div class="lightbox-info">
+        <div class="photo-date" id="lb-date"></div>
+        <div class="photo-title" id="lb-title"></div>
+        <div class="photo-caption" id="lb-caption"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DEFAULT_ALBUM = [
+      {
+        src: "./DSC08109.jpg",
+        date: "2026.04",
+        title: "3年次のスタート・学び舎の風景",
+        caption: "澄み渡る青空のもと、高校生活最後の1年が始まりました。"
+      }
+    ];
+
+    let photos = [...DEFAULT_ALBUM];
+    let currentIndex = 0;
+
+    function renderGrid() {
+      const grid = document.getElementById("album-grid");
+      grid.innerHTML = "";
+
+      if (!photos || photos.length === 0) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column: 1 / -1;">現在登録されている写真はありません。</div>';
+        return;
+      }
+
+      photos.forEach((p, idx) => {
+        const card = document.createElement("article");
+        card.className = "photo-card";
+        card.innerHTML = `
+          <div class="photo-thumb-wrap">
+            <img src="${p.src}" alt="${p.title || ''}" loading="lazy">
+          </div>
+          <div class="photo-body">
+            <div class="photo-date">${p.date || ""}</div>
+            <h2 class="photo-title">${p.title || "思い出の1枚"}</h2>
+            <p class="photo-caption">${p.caption || ""}</p>
+          </div>
+        `;
+        card.addEventListener("click", () => openLightbox(idx));
+        grid.appendChild(card);
+      });
+    }
+
+    function openLightbox(idx) {
+      currentIndex = idx;
+      updateLightbox();
+      document.getElementById("lightbox").classList.add("is-open");
+    }
+
+    function updateLightbox() {
+      const p = photos[currentIndex];
+      if (!p) return;
+      document.getElementById("lb-img").src = p.src;
+      document.getElementById("lb-date").textContent = p.date || "";
+      document.getElementById("lb-title").textContent = p.title || "";
+      document.getElementById("lb-caption").textContent = p.caption || "";
+    }
+
+    function closeLightbox() {
+      document.getElementById("lightbox").classList.remove("is-open");
+    }
+
+    document.getElementById("lb-close").addEventListener("click", closeLightbox);
+    document.getElementById("lightbox").addEventListener("click", (e) => {
+      if (e.target.id === "lightbox") closeLightbox();
+    });
+
+    document.getElementById("lb-prev").addEventListener("click", () => {
+      currentIndex = (currentIndex - 1 + photos.length) % photos.length;
+      updateLightbox();
+    });
+
+    document.getElementById("lb-next").addEventListener("click", () => {
+      currentIndex = (currentIndex + 1) % photos.length;
+      updateLightbox();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (!document.getElementById("lightbox").classList.contains("is-open")) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") {
+        currentIndex = (currentIndex - 1 + photos.length) % photos.length;
+        updateLightbox();
+      }
+      if (e.key === "ArrowRight") {
+        currentIndex = (currentIndex + 1) % photos.length;
+        updateLightbox();
+      }
+    });
+
+    document.getElementById("campus-bg-img").addEventListener("error", (e) => {
+      e.target.style.display = "none";
+    });
+
+    async function loadAlbum() {
+      try {
+        const res = await fetch("/api/config", { cache: "no-store" });
+        if (res.ok) {
+          const remote = await res.json();
+          if (remote && remote.theme) {
+            document.body.dataset.theme = remote.theme;
+          }
+          if (remote && remote.schoolName) {
+            document.getElementById("school-sub").textContent = `${remote.schoolName} 令和8年度 卒業記念アーカイブ`;
+            document.getElementById("school-footer").textContent = `${remote.schoolName} 令和8年度 卒業カウントダウン`;
+          }
+          if (remote && Array.isArray(remote.albumPhotos) && remote.albumPhotos.length > 0) {
+            photos = remote.albumPhotos;
+          }
+        }
+      } catch (_) {}
+      renderGrid();
+    }
+
+    loadAlbum();
+  </script>
+</body>
+</html>
