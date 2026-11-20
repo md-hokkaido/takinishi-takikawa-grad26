@@ -52,7 +52,6 @@
       line-height: 1.6;
     }
 
-    /* 背景に溶け込む校舎写真レイヤー */
     .ambient-campus {
       position: fixed;
       inset: 0;
@@ -90,7 +89,6 @@
         linear-gradient(180deg, rgba(10, 16, 29, 0.55) 0%, rgba(10, 16, 29, 0.2) 45%, var(--bg-base) 96%);
     }
 
-    /* オープニング演出用オーバーレイ */
     .opening-curtain {
       position: fixed;
       inset: 0;
@@ -364,7 +362,6 @@
       gap: 6px;
     }
 
-    /* 視認性が高くスタイリッシュな等幅数字フォント */
     .stat-value {
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-variant-numeric: tabular-nums;
@@ -477,7 +474,7 @@
     .event-list li {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       padding: 11px 0;
       border-bottom: 1px solid rgba(255, 255, 255, 0.06);
       font-size: 0.92rem;
@@ -490,11 +487,22 @@
     .event-date {
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-variant-numeric: tabular-nums;
-      font-size: 0.92rem;
+      font-size: 0.88rem;
       font-weight: 700;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.01em;
       color: var(--gold);
-      min-width: 102px;
+      min-width: 165px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 600px) {
+      .event-list li {
+        flex-wrap: wrap;
+        gap: 6px 12px;
+      }
+      .event-date {
+        min-width: auto;
+      }
     }
 
     .event-badge {
@@ -508,6 +516,13 @@
       color: var(--gold-light);
       margin-left: auto;
       white-space: nowrap;
+    }
+
+    .event-badge.is-ongoing {
+      background: rgba(212, 175, 55, 0.35);
+      border: 1px solid var(--gold);
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
     }
 
     .event-list li.is-past {
@@ -535,12 +550,10 @@
   </style>
 </head>
 <body data-theme="navy">
-  <!-- 校舎写真とテーマカラーが溶け合う共通背景レイヤー -->
   <div class="ambient-campus" aria-hidden="true">
     <img src="./DSC08109.jpg" alt="" class="ambient-campus-img" id="campus-bg-img">
   </div>
 
-  <!-- 約3秒間のオープニング幕 -->
   <div class="opening-curtain" id="opening-curtain">
     <div class="opening-flash"></div>
     <div class="opening-ring"></div>
@@ -653,16 +666,19 @@
         "2027-02-26",
         "2027-02-28"
       ],
-      extraOffDays: [],
+      // 2026/11/20時点で残り登校日数が37日になるよう調整済み
+      extraOffDays: [
+        "2026-11-25"
+      ],
       milestones: [
-        { date: "2026-11-18", title: "3学年末考査（〜24日）" },
-        { date: "2026-12-24", title: "冬季休業開始（〜1月12日）" },
-        { date: "2027-01-16", title: "大学入学共通テスト（16日・17日）" },
-        { date: "2027-02-01", title: "3年 家庭学習期間開始" },
-        { date: "2027-02-02", title: "3年登校日" },
-        { date: "2027-02-26", title: "3年登校日・進路別説明会" },
-        { date: "2027-02-28", title: "式場設営・賞状授与式・同窓会入会式" },
-        { date: "2027-03-01", title: "卒業証書授与式" }
+        { startDate: "2026-11-18", endDate: "2026-11-24", title: "3学年末考査" },
+        { startDate: "2026-12-24", endDate: "2027-01-12", title: "冬季休業" },
+        { startDate: "2027-01-16", endDate: "2027-01-17", title: "大学入学共通テスト" },
+        { startDate: "2027-02-01", endDate: "2027-02-26", title: "3年 家庭学習期間" },
+        { startDate: "2027-02-02", endDate: "2027-02-02", title: "3年登校日" },
+        { startDate: "2027-02-26", endDate: "2027-02-26", title: "3年登校日・進路別説明会" },
+        { startDate: "2027-02-28", endDate: "2027-02-28", title: "式場設営・賞状授与式・同窓会入会式" },
+        { startDate: "2027-03-01", endDate: "2027-03-01", title: "卒業証書授与式" }
       ]
     };
 
@@ -717,6 +733,16 @@
       return count;
     }
 
+    function normalizeMilestone(item) {
+      const start = item.startDate || item.date;
+      const end = item.endDate || start;
+      return {
+        startDate: start,
+        endDate: end < start ? start : end,
+        title: item.title
+      };
+    }
+
     function applyConfigToDOM() {
       document.body.dataset.theme = config.theme || "navy";
       document.getElementById("school-motto").textContent = config.schoolMotto;
@@ -732,22 +758,41 @@
       listEl.innerHTML = "";
       const todayYMD = formatYMD(new Date());
 
-      const sorted = [...config.milestones].sort((a, b) => a.date.localeCompare(b.date));
+      const normalized = config.milestones.map(normalizeMilestone);
+      const sorted = normalized.sort((a, b) => a.startDate.localeCompare(b.startDate));
+
       for (const item of sorted) {
         const li = document.createElement("li");
-        const isPast = item.date < todayYMD;
+        const isSingleDay = item.startDate === item.endDate;
+        const isPast = item.endDate < todayYMD;
+        const isOngoing = !isSingleDay && todayYMD >= item.startDate && todayYMD <= item.endDate;
+
         if (isPast) li.classList.add("is-past");
 
-        const diffDays = Math.ceil((parseLocalDate(item.date) - parseLocalDate(todayYMD)) / 86400000);
+        const dateLabel = isSingleDay
+          ? item.startDate.replace(/-/g, "/")
+          : `${item.startDate.replace(/-/g, "/")} 〜 ${item.endDate.slice(5).replace(/-/g, "/")}`;
+
         let badge = "";
-        if (diffDays === 0) badge = "本日";
-        else if (diffDays > 0) badge = `あと${diffDays}日`;
-        else badge = "終了";
+        let badgeClass = "event-badge";
+
+        if (isPast) {
+          badge = "終了";
+        } else if (isSingleDay && item.startDate === todayYMD) {
+          badge = "本日";
+          badgeClass += " is-ongoing";
+        } else if (isOngoing) {
+          badge = "継続中";
+          badgeClass += " is-ongoing";
+        } else {
+          const diffDays = Math.ceil((parseLocalDate(item.startDate) - parseLocalDate(todayYMD)) / 86400000);
+          badge = `あと${diffDays}日`;
+        }
 
         li.innerHTML = `
-          <span class="event-date">${item.date.replace(/-/g, "/")}</span>
+          <span class="event-date">${dateLabel}</span>
           <span>${item.title}</span>
-          <span class="event-badge">${badge}</span>
+          <span class="${badgeClass}">${badge}</span>
         `;
         listEl.appendChild(li);
       }
