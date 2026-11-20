@@ -90,6 +90,14 @@
         linear-gradient(180deg, rgba(10, 16, 29, 0.55) 0%, rgba(10, 16, 29, 0.2) 45%, var(--bg-base) 96%);
     }
 
+    .ai-credit {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      color: var(--text-sub);
+      opacity: 0.7;
+    }
+
     /* メンテナンス専用画面 */
     .maintenance-screen {
       display: none;
@@ -119,7 +127,7 @@
       border: 1px solid var(--card-border);
       backdrop-filter: blur(16px);
       border-radius: 16px;
-      padding: 40px 28px;
+      padding: 40px 28px 28px;
       box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
     }
 
@@ -153,14 +161,7 @@
       color: var(--text-main);
       line-height: 1.85;
       white-space: pre-wrap;
-      margin-bottom: 24px;
-    }
-
-    .maintenance-school {
-      font-family: 'Shippori Mincho', serif;
-      font-size: 0.85rem;
-      color: var(--text-sub);
-      letter-spacing: 0.12em;
+      margin-bottom: 28px;
     }
 
     /* オープニング演出 */
@@ -611,6 +612,13 @@
       color: var(--text-sub);
     }
 
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+
     footer a {
       color: var(--text-sub);
       text-decoration: none;
@@ -637,9 +645,11 @@
       <div class="maintenance-line"></div>
       <p class="maintenance-msg" id="maintenance-message">ただいまサイトの更新・調整作業を行っております。
 作業が完了するまで、しばらくお待ちください。</p>
+      <div class="ai-credit">Created by Google Gemini</div>
     </div>
   </div>
 
+  <!-- オープニング幕 -->
   <div class="opening-curtain" id="opening-curtain">
     <div class="opening-flash"></div>
     <div class="opening-ring"></div>
@@ -718,11 +728,12 @@
 
     <footer class="reveal-item delay-5">
       <p id="sync-status" style="margin-bottom: 6px;"></p>
-      <div style="display: flex; justify-content: center; gap: 16px;">
+      <div class="footer-links">
         <a href="/about.html">このサイトについて</a>
         <span>|</span>
         <a href="/adm.html">管理画面</a>
       </div>
+      <p class="ai-credit">Created by Google Gemini</p>
     </footer>
   </div>
 
