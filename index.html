@@ -545,32 +545,15 @@
       gap: 8px;
     }
 
-    /* 常時アニメーションするフォトストリーム（アルバム連携） */
-    .album-strip-card {
+    /* 常時アニメーションフォト（アルバムとは独立表示） */
+    .showcase-strip-card {
       margin-bottom: 28px;
       padding: 24px 0 22px;
       overflow: hidden;
     }
 
-    .album-strip-card .section-title {
+    .showcase-strip-card .section-title {
       margin: 0 24px 16px;
-    }
-
-    .album-link-btn {
-      font-family: 'Shippori Mincho', serif;
-      font-size: 0.82rem;
-      color: var(--gold-light);
-      text-decoration: none;
-      padding: 4px 14px;
-      border-radius: 99px;
-      border: 1px solid var(--card-border);
-      background: rgba(212, 175, 55, 0.12);
-      transition: background 0.25s, border-color 0.25s;
-    }
-
-    .album-link-btn:hover {
-      background: rgba(212, 175, 55, 0.26);
-      border-color: var(--gold);
     }
 
     .marquee-viewport {
@@ -599,14 +582,13 @@
 
     .marquee-item {
       position: relative;
-      width: 240px;
-      height: 152px;
+      width: 250px;
+      height: 158px;
       border-radius: 10px;
       overflow: hidden;
       border: 1px solid rgba(212, 175, 55, 0.25);
       flex-shrink: 0;
-      display: block;
-      text-decoration: none;
+      cursor: pointer;
       background: rgba(0, 0, 0, 0.35);
     }
 
@@ -614,11 +596,13 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      animation: gentleZoom 12s ease-in-out infinite alternate;
       transition: transform 0.6s ease;
     }
 
-    .marquee-item:hover img {
-      transform: scale(1.08);
+    @keyframes gentleZoom {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.07); }
     }
 
     .marquee-caption {
@@ -632,6 +616,89 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    /* アルバムページへの専用誘導バナー */
+    .album-cta-card {
+      margin-bottom: 28px;
+      padding: 22px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .album-cta-title {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1.1rem;
+      color: var(--gold-light);
+      margin-bottom: 4px;
+    }
+
+    .album-cta-desc {
+      font-size: 0.84rem;
+      color: var(--text-sub);
+    }
+
+    .album-link-btn {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 0.9rem;
+      color: var(--gold-light);
+      text-decoration: none;
+      padding: 10px 22px;
+      border-radius: 99px;
+      border: 1px solid var(--gold);
+      background: rgba(212, 175, 55, 0.15);
+      white-space: nowrap;
+      transition: background 0.25s, transform 0.2s;
+    }
+
+    .album-link-btn:hover {
+      background: rgba(212, 175, 55, 0.28);
+      transform: translateY(-1px);
+    }
+
+    /* ハイライト写真その場拡大モーダル */
+    .preview-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 250;
+      background: rgba(6, 10, 18, 0.9);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .preview-modal.is-open {
+      display: flex;
+    }
+
+    .preview-modal-box {
+      max-width: 820px;
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .preview-modal-box img {
+      max-width: 100%;
+      max-height: 72vh;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .preview-modal-caption {
+      padding: 14px 20px;
+      font-family: 'Shippori Mincho', serif;
+      color: var(--gold-light);
+      font-size: 0.95rem;
     }
 
     .event-list {
@@ -810,15 +877,24 @@
       </div>
     </div>
 
-    <!-- 常時アニメーションする思い出アルバムストリーム -->
-    <div class="card album-strip-card reveal-item delay-4" id="album-strip-section">
+    <!-- アルバムとは別に常時アニメーションで流れるフォトストリーム -->
+    <div class="card showcase-strip-card reveal-item delay-4" id="showcase-strip-section">
       <div class="section-title">
-        <span>思い出のアルバム</span>
-        <a href="/album.html" class="album-link-btn">アルバムをすべて見る →</a>
+        <span>学び舎の風景・ハイライト</span>
+        <small style="font-family: 'Noto Sans JP', sans-serif; font-size: 0.75rem; color: var(--text-sub);">クリックで拡大表示</small>
       </div>
       <div class="marquee-viewport">
         <div class="marquee-track" id="marquee-track"></div>
       </div>
+    </div>
+
+    <!-- 独立したアルバムページへの誘導カード -->
+    <div class="card album-cta-card reveal-item delay-4">
+      <div>
+        <div class="album-cta-title">3学年 思い出のアルバム</div>
+        <div class="album-cta-desc">学校行事や日々の記録をまとめた専用ギャラリーページです。</div>
+      </div>
+      <a href="/album.html" class="album-link-btn">アルバムページを開く →</a>
     </div>
 
     <div class="card reveal-item delay-5">
@@ -840,6 +916,14 @@
       </div>
       <p class="ai-credit">Created by Google Gemini</p>
     </footer>
+  </div>
+
+  <!-- ハイライト写真拡大プレビュー -->
+  <div class="preview-modal" id="preview-modal">
+    <div class="preview-modal-box">
+      <img src="" alt="" id="preview-modal-img">
+      <div class="preview-modal-caption" id="preview-modal-caption"></div>
+    </div>
   </div>
 
   <script>
@@ -873,12 +957,11 @@
       extraOffDays: [
         "2026-11-25"
       ],
-      albumPhotos: [
+      // メインページ常時アニメーション専用の写真（アルバムとは別管理）
+      marqueePhotos: [
         {
           src: "./DSC08109.jpg",
-          date: "2026.04",
-          title: "3年次のスタート・学び舎の風景",
-          caption: "澄み渡る青空のもと、高校生活最後の1年が始まりました。"
+          title: "北海道滝川西高等学校 校舎風景"
         }
       ],
       milestones: [
@@ -954,12 +1037,12 @@
       };
     }
 
-    function renderAlbumMarquee() {
+    function renderShowcaseMarquee() {
       const track = document.getElementById("marquee-track");
-      const section = document.getElementById("album-strip-section");
-      const photos = (config.albumPhotos && config.albumPhotos.length > 0)
-        ? config.albumPhotos
-        : DEFAULT_CONFIG.albumPhotos;
+      const section = document.getElementById("showcase-strip-section");
+      const photos = (config.marqueePhotos && config.marqueePhotos.length > 0)
+        ? config.marqueePhotos
+        : DEFAULT_CONFIG.marqueePhotos;
 
       if (!photos || photos.length === 0) {
         section.style.display = "none";
@@ -969,7 +1052,6 @@
       section.style.display = "block";
       track.innerHTML = "";
 
-      // 途切れなく無限ループさせるために最低6枚以上になるよう複製して2セット連結
       let baseList = [...photos];
       while (baseList.length < 6) {
         baseList = baseList.concat(photos);
@@ -979,16 +1061,24 @@
       track.style.setProperty("--marquee-duration", `${baseList.length * 4.5}s`);
 
       for (const p of loopList) {
-        const a = document.createElement("a");
-        a.href = "/album.html";
-        a.className = "marquee-item";
-        a.innerHTML = `
+        const div = document.createElement("div");
+        div.className = "marquee-item";
+        div.innerHTML = `
           <img src="${p.src}" alt="${p.title || ''}" loading="lazy">
-          <div class="marquee-caption">${p.date ? p.date + " " : ""}${p.title || ""}</div>
+          <div class="marquee-caption">${p.title || ""}</div>
         `;
-        track.appendChild(a);
+        div.addEventListener("click", () => {
+          document.getElementById("preview-modal-img").src = p.src;
+          document.getElementById("preview-modal-caption").textContent = p.title || "";
+          document.getElementById("preview-modal").classList.add("is-open");
+        });
+        track.appendChild(div);
       }
     }
+
+    document.getElementById("preview-modal").addEventListener("click", () => {
+      document.getElementById("preview-modal").classList.remove("is-open");
+    });
 
     function applyConfigToDOM() {
       document.body.dataset.theme = config.theme || "navy";
@@ -1004,7 +1094,7 @@
       document.getElementById("notice-banner").textContent = config.notice || "";
       document.getElementById("grad-date-text").textContent = `${formatJPDate(config.graduationDate)} 挙行`;
 
-      renderAlbumMarquee();
+      renderShowcaseMarquee();
 
       const listEl = document.getElementById("event-list");
       listEl.innerHTML = "";
