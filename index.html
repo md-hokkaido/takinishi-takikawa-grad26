@@ -541,6 +541,97 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* 常時アニメーションするフォトストリーム（アルバム連携） */
+    .album-strip-card {
+      margin-bottom: 28px;
+      padding: 24px 0 22px;
+      overflow: hidden;
+    }
+
+    .album-strip-card .section-title {
+      margin: 0 24px 16px;
+    }
+
+    .album-link-btn {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 0.82rem;
+      color: var(--gold-light);
+      text-decoration: none;
+      padding: 4px 14px;
+      border-radius: 99px;
+      border: 1px solid var(--card-border);
+      background: rgba(212, 175, 55, 0.12);
+      transition: background 0.25s, border-color 0.25s;
+    }
+
+    .album-link-btn:hover {
+      background: rgba(212, 175, 55, 0.26);
+      border-color: var(--gold);
+    }
+
+    .marquee-viewport {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
+    }
+
+    .marquee-track {
+      display: flex;
+      gap: 16px;
+      width: max-content;
+      animation: marqueeScroll var(--marquee-duration, 28s) linear infinite;
+    }
+
+    .marquee-viewport:hover .marquee-track {
+      animation-play-state: paused;
+    }
+
+    @keyframes marqueeScroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .marquee-item {
+      position: relative;
+      width: 240px;
+      height: 152px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      flex-shrink: 0;
+      display: block;
+      text-decoration: none;
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    .marquee-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+
+    .marquee-item:hover img {
+      transform: scale(1.08);
+    }
+
+    .marquee-caption {
+      position: absolute;
+      inset: auto 0 0 0;
+      padding: 22px 10px 8px;
+      background: linear-gradient(180deg, transparent 0%, rgba(8, 12, 22, 0.88) 100%);
+      color: #fff;
+      font-size: 0.78rem;
+      font-family: 'Shippori Mincho', serif;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .event-list {
@@ -615,14 +706,15 @@
     .footer-links {
       display: flex;
       justify-content: center;
-      gap: 16px;
+      flex-wrap: wrap;
+      gap: 14px;
       margin-bottom: 10px;
     }
 
     footer a {
       color: var(--text-sub);
       text-decoration: none;
-      opacity: 0.7;
+      opacity: 0.75;
       transition: opacity 0.2s, color 0.2s;
     }
 
@@ -718,6 +810,17 @@
       </div>
     </div>
 
+    <!-- 常時アニメーションする思い出アルバムストリーム -->
+    <div class="card album-strip-card reveal-item delay-4" id="album-strip-section">
+      <div class="section-title">
+        <span>思い出のアルバム</span>
+        <a href="/album.html" class="album-link-btn">アルバムをすべて見る →</a>
+      </div>
+      <div class="marquee-viewport">
+        <div class="marquee-track" id="marquee-track"></div>
+      </div>
+    </div>
+
     <div class="card reveal-item delay-5">
       <div class="section-title">
         <span>今後の主な学年日程</span>
@@ -729,6 +832,8 @@
     <footer class="reveal-item delay-5">
       <p id="sync-status" style="margin-bottom: 6px;"></p>
       <div class="footer-links">
+        <a href="/album.html">思い出のアルバム</a>
+        <span>|</span>
         <a href="/about.html">このサイトについて</a>
         <span>|</span>
         <a href="/adm.html">管理画面</a>
@@ -767,6 +872,14 @@
       ],
       extraOffDays: [
         "2026-11-25"
+      ],
+      albumPhotos: [
+        {
+          src: "./DSC08109.jpg",
+          date: "2026.04",
+          title: "3年次のスタート・学び舎の風景",
+          caption: "澄み渡る青空のもと、高校生活最後の1年が始まりました。"
+        }
       ],
       milestones: [
         { startDate: "2026-11-18", endDate: "2026-11-24", title: "3学年末考査" },
@@ -841,6 +954,42 @@
       };
     }
 
+    function renderAlbumMarquee() {
+      const track = document.getElementById("marquee-track");
+      const section = document.getElementById("album-strip-section");
+      const photos = (config.albumPhotos && config.albumPhotos.length > 0)
+        ? config.albumPhotos
+        : DEFAULT_CONFIG.albumPhotos;
+
+      if (!photos || photos.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      track.innerHTML = "";
+
+      // 途切れなく無限ループさせるために最低6枚以上になるよう複製して2セット連結
+      let baseList = [...photos];
+      while (baseList.length < 6) {
+        baseList = baseList.concat(photos);
+      }
+      const loopList = baseList.concat(baseList);
+
+      track.style.setProperty("--marquee-duration", `${baseList.length * 4.5}s`);
+
+      for (const p of loopList) {
+        const a = document.createElement("a");
+        a.href = "/album.html";
+        a.className = "marquee-item";
+        a.innerHTML = `
+          <img src="${p.src}" alt="${p.title || ''}" loading="lazy">
+          <div class="marquee-caption">${p.date ? p.date + " " : ""}${p.title || ""}</div>
+        `;
+        track.appendChild(a);
+      }
+    }
+
     function applyConfigToDOM() {
       document.body.dataset.theme = config.theme || "navy";
       document.getElementById("school-motto").textContent = config.schoolMotto;
@@ -854,6 +1003,8 @@
       document.getElementById("opening-title").textContent = config.pageTitle;
       document.getElementById("notice-banner").textContent = config.notice || "";
       document.getElementById("grad-date-text").textContent = `${formatJPDate(config.graduationDate)} 挙行`;
+
+      renderAlbumMarquee();
 
       const listEl = document.getElementById("event-list");
       listEl.innerHTML = "";
