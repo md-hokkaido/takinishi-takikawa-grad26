@@ -49,7 +49,7 @@
       color: var(--text-main);
       min-height: 100vh;
       overflow-x: hidden;
-      line-height: 1.8;
+      line-height: 1.85;
     }
 
     .ambient-campus {
@@ -118,7 +118,7 @@
       border: 1px solid var(--card-border);
       backdrop-filter: blur(14px);
       border-radius: 14px;
-      padding: 28px 28px;
+      padding: 28px;
       margin-bottom: 24px;
       box-shadow: 0 14px 36px rgba(0, 0, 0, 0.42);
     }
@@ -162,9 +162,13 @@
     .info-list li {
       position: relative;
       padding-left: 18px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       font-size: 0.93rem;
       color: var(--text-main);
+    }
+
+    .info-list li:last-child {
+      margin-bottom: 0;
     }
 
     .info-list li::before {
@@ -178,30 +182,55 @@
     .domain-box {
       background: rgba(212, 175, 55, 0.08);
       border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 14px 18px;
-      margin: 14px 0;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+
+    .domain-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 8px;
+      padding: 6px 0;
+    }
+
+    .domain-row + .domain-row {
+      margin-top: 8px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(212, 175, 55, 0.25);
     }
 
     .domain-name {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       font-weight: 700;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.04em;
       color: var(--gold-light);
+      word-break: break-all;
     }
 
     .domain-tag {
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       padding: 3px 10px;
       border-radius: 99px;
       background: rgba(212, 175, 55, 0.2);
       color: var(--gold-light);
+      white-space: nowrap;
+    }
+
+    .creator-note {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.88rem;
+      color: var(--text-sub);
+    }
+
+    .creator-note strong {
+      color: var(--gold-light);
+      font-weight: 600;
     }
 
     .back-area {
@@ -250,38 +279,49 @@
     <section class="card">
       <h2>このサイトの説明</h2>
       <p>
-        本サイトは、令和8年度（2026年度）の卒業を迎える生徒に向けて、卒業証書授与式までの残り日数および残り登校日数をリアルタイムで案内するカウントダウンWebページです。
+        このサイトは、令和8年度（2026年度）に卒業を迎える3年生のみんなに向けて、卒業証書授与式までの残り日数や「あと何回学校に通うのか」をリアルタイムでお知らせするカウントダウンページです。
       </p>
       <p>
-        年間行事予定表に基づき、土日祝日・夏季休業・冬季休業・家庭学習期間などを除外した実際の登校日数を自動算出しています。また、行事予定の変更や臨時登校日などが発生した際も、管理画面からの更新によって全端末へ最新の日程が即座に反映される仕組みを備えています。
+        学校の年間行事予定表をもとに、土日祝日や夏休み・冬休み、3年生の家庭学習期間などを除いた「実際の登校日数」を自動で計算しています。もし行事予定の変更や臨時登校日などが決まったときも、最新の予定がみんなのスマホやパソコンにすぐ反映されるようになっています。
       </p>
     </section>
 
     <section class="card">
       <h2>サイトの安全性について</h2>
       <p>
-        閲覧される生徒・保護者の皆さまに安心してご利用いただけるよう、セキュリティとプライバシー保護に配慮した設計を行っています。
+        閲覧する生徒のみんなに安心して使ってもらえるよう、セキュリティ面にもしっかり配慮して作成しています。
       </p>
       <ul class="info-list">
-        <li><strong>個人情報の非収集：</strong>氏名・学籍番号・メールアドレス・位置情報などの個人を特定できる情報は一切取得・保存していません。</li>
-        <li><strong>通信の暗号化（HTTPS）：</strong>すべての通信はSSL/TLSによって暗号化されており、第三者による盗聴や改ざんを防止しています。</li>
-        <li><strong>広告・外部トラッキングなし：</strong>第三者による広告配信や行動追跡スクリプトは組み込んでいません。</li>
-        <li><strong>安全なホスティング基盤：</strong>世界的なクラウドインフラである Cloudflare Pages 上で稼働しており、高い安定性と不正アクセス対策を備えています。</li>
+        <li><strong>通信の暗号化（HTTPS）：</strong>すべての通信はSSL/TLSという仕組みで暗号化されており、第三者によるデータの盗み見や改ざんを防いでいます。</li>
+        <li><strong>広告・外部トラッキングなし：</strong>不審な広告や、閲覧履歴を追跡するような外部スクリプトは一切組み込んでいません。</li>
+        <li><strong>安全なホスティング基盤：</strong>世界中で利用されているクラウド基盤「Cloudflare Pages」上で動かしており、高い安定性と不正アクセス対策を備えています。</li>
       </ul>
     </section>
 
     <section class="card">
       <h2>サイトで使用しているドメインについて</h2>
       <p>
-        本サイトで使用している以下のドメインは、本サイトの管理者が正規に取得・管理している独自ドメインです。
+        インターネット上の住所にあたる「ドメイン」には、サイト作成者が正規に取得・管理している独自ドメインを使用しています。
       </p>
       <div class="domain-box">
-        <span class="domain-name">md-hokkaido.com</span>
-        <span class="domain-tag">管理者保有 独自ドメイン</span>
+        <div class="domain-row">
+          <span class="domain-name">md-hokkaido.com</span>
+          <span class="domain-tag">大元の独自ドメイン</span>
+        </div>
+        <div class="domain-row">
+          <span class="domain-name">takinishi-takikawa-grad26.md-hokkaido.com</span>
+          <span class="domain-tag">本サイト専用のサブドメイン</span>
+        </div>
       </div>
       <p>
-        不審な外部サイトやフィッシングサイトではなく、本サイトの公開・運用のために管理者が管理しているドメインですので、安心してアクセスしてください。
+        URLの先頭についている <strong>「takinishi-takikawa-grad26」</strong> の部分は<strong>「サブドメイン」</strong>と呼ばれるもので、大元のドメイン（<code>md-hokkaido.com</code>）を管理している本人だけが作成・公開できる専用のアドレスです。
       </p>
+      <p>
+        見慣れない英数字が並んでいるため最初は少し不思議に感じるかもしれませんが、外部の怪しいサイトやフィッシングサイトではなく、このカウントダウンサイト専用に用意された安全なURLですので安心してアクセスしてください。
+      </p>
+      <div class="creator-note">
+        サイト作成・ドメイン管理：<strong>【前田　将弥｜Masaya Maeda】</strong>
+      </div>
     </section>
 
     <div class="back-area">
@@ -290,6 +330,7 @@
 
     <footer>
       <p id="school-footer">北海道滝川西高等学校 令和8年度 卒業カウントダウン</p>
+      <p style="margin-top: 4px;">Created by 【ここに作成者名を入力】</p>
     </footer>
   </div>
 
@@ -298,7 +339,6 @@
       e.target.style.display = "none";
     });
 
-    // メインページで設定されているテーマカラーを自動同期
     async function syncTheme() {
       try {
         const res = await fetch("/api/config", { cache: "no-store" });
