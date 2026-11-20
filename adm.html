@@ -181,13 +181,47 @@
       .milestone-row input[type="text"] { grid-column: 1 / -1; }
       .milestone-row button { grid-column: 1 / -1; }
     }
+
+    /* アルバム写真編集カード */
+    .album-edit-item {
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 12px;
+      display: grid;
+      grid-template-columns: 120px 1fr auto;
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 680px) {
+      .album-edit-item {
+        grid-template-columns: 1fr;
+      }
+    }
+    .album-edit-thumb {
+      width: 120px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: #e2e8f0;
+    }
+    .album-edit-fields {
+      display: grid;
+      grid-template-columns: 1fr 120px;
+      gap: 8px;
+    }
+    .album-edit-fields .full {
+      grid-column: 1 / -1;
+    }
+
     .hint-text {
       font-size: 0.8rem;
       color: #64748b;
       margin-bottom: 12px;
     }
 
-    /* ユーザー管理テーブル */
     .user-list {
       width: 100%;
       border-collapse: collapse;
@@ -235,7 +269,7 @@
 </head>
 <body>
 
-<!-- 1. ログイン画面（ユーザーID + パスワード） -->
+  <!-- 1. ログイン画面 -->
   <div id="auth-view" class="auth-box">
     <h1 style="margin-bottom: 10px;">管理者ログイン</h1>
     <p style="font-size: 0.84rem; color: #64748b; margin-bottom: 18px;">
@@ -318,6 +352,19 @@
       </div>
     </div>
 
+    <!-- 思い出アルバム写真管理カード -->
+    <div class="card">
+      <h2>
+        <span>思い出のアルバム写真管理</span>
+        <a href="/album.html" target="_blank" style="font-size: 0.82rem; color: #1d4ed8; text-decoration: none;">アルバムページを開く ↗</a>
+      </h2>
+      <p class="hint-text">
+        ※ GitHubリポジトリにアップロードした画像パス（例: <code>./photo1.jpg</code>）または画像URLを指定すると、メインページのアニメーションと専用アルバムページの両方に自動反映されます。
+      </p>
+      <div id="album-editor-container"></div>
+      <button class="btn btn-secondary" id="add-album-btn">+ 写真を追加</button>
+    </div>
+
     <div class="card">
       <h2>基準日・卒業式日時</h2>
       <div class="grid-3">
@@ -365,7 +412,7 @@
     </div>
   </div>
 
-  <!-- 3. さらに奥のページ：管理者ユーザーアカウント管理画面 -->
+  <!-- 3. 管理者ユーザーアカウント管理画面 -->
   <div id="users-view" class="container" style="display: none;">
     <div class="header">
       <div class="header-left">
@@ -438,6 +485,14 @@
       ],
       extraSchoolDays: ["2027-02-02", "2027-02-26", "2027-02-28"],
       extraOffDays: ["2026-11-25"],
+      albumPhotos: [
+        {
+          src: "./DSC08109.jpg",
+          date: "2026.04",
+          title: "3年次のスタート・学び舎の風景",
+          caption: "澄み渡る青空のもと、高校生活最後の1年が始まりました。"
+        }
+      ],
       milestones: [
         { startDate: "2026-11-18", endDate: "2026-11-24", title: "3学年末考査" },
         { startDate: "2026-12-24", endDate: "2027-01-12", title: "冬季休業" },
@@ -529,6 +584,56 @@
         cursor.setDate(cursor.getDate() + 1);
       }
       document.getElementById("admin-school-days-preview").textContent = `今日からの残り登校日数: ${remCount}日`;
+    }
+
+    function renderAlbumEditor() {
+      if (!Array.isArray(config.albumPhotos)) {
+        config.albumPhotos = structuredClone(DEFAULT_CONFIG.albumPhotos);
+      }
+      const container = document.getElementById("album-editor-container");
+      container.innerHTML = "";
+
+      config.albumPhotos.forEach((photo, idx) => {
+        const item = document.createElement("div");
+        item.className = "album-edit-item";
+        item.innerHTML = `
+          <img src="${photo.src || ''}" alt="" class="album-edit-thumb">
+          <div class="album-edit-fields">
+            <input type="text" value="${photo.title || ''}" data-field="title" placeholder="タイトル（例: 学校祭・体育祭）">
+            <input type="text" value="${photo.date || ''}" data-field="date" placeholder="時期（例: 2026.07）">
+            <input type="text" class="full" value="${photo.src || ''}" data-field="src" placeholder="画像パス（例: ./photo1.jpg）">
+            <input type="text" class="full" value="${photo.caption || ''}" data-field="caption" placeholder="思い出のコメント・説明文">
+          </div>
+          <button class="btn btn-danger">削除</button>
+        `;
+
+        const thumb = item.querySelector("img");
+        const srcInput = item.querySelector('input[data-field="src"]');
+        const titleInput = item.querySelector('input[data-field="title"]');
+        const dateInput = item.querySelector('input[data-field="date"]');
+        const captionInput = item.querySelector('input[data-field="caption"]');
+
+        srcInput.addEventListener("change", () => {
+          config.albumPhotos[idx].src = srcInput.value.trim();
+          thumb.src = config.albumPhotos[idx].src;
+        });
+        titleInput.addEventListener("change", () => {
+          config.albumPhotos[idx].title = titleInput.value;
+        });
+        dateInput.addEventListener("change", () => {
+          config.albumPhotos[idx].date = dateInput.value;
+        });
+        captionInput.addEventListener("change", () => {
+          config.albumPhotos[idx].caption = captionInput.value;
+        });
+
+        item.querySelector("button").addEventListener("click", () => {
+          config.albumPhotos.splice(idx, 1);
+          renderAlbumEditor();
+        });
+
+        container.appendChild(item);
+      });
     }
 
     function normalizeMilestones() {
@@ -667,6 +772,7 @@
       document.getElementById("graduationDate").value = config.graduationDate;
       document.getElementById("graduationTime").value = config.graduationTime;
       renderMaintenanceUI();
+      renderAlbumEditor();
       renderCalendar();
       renderMilestones();
     }
@@ -789,7 +895,6 @@
       }
     });
 
-    // ユーザー管理画面との切り替え
     document.getElementById("open-users-btn").addEventListener("click", () => {
       document.getElementById("admin-view").style.display = "none";
       document.getElementById("users-view").style.display = "block";
@@ -835,6 +940,16 @@
         config.maintenanceMode = !nextState;
         renderMaintenanceUI();
       }
+    });
+
+    document.getElementById("add-album-btn").addEventListener("click", () => {
+      config.albumPhotos.push({
+        src: "./DSC08109.jpg",
+        date: "2026.11",
+        title: "新しい思い出",
+        caption: ""
+      });
+      renderAlbumEditor();
     });
 
     document.getElementById("prev-month").addEventListener("click", () => {
