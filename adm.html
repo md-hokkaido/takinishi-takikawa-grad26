@@ -83,8 +83,13 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
     }
-    @media (max-width: 640px) {
-      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 720px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
     }
     label {
       display: block;
@@ -182,38 +187,28 @@
       .milestone-row button { grid-column: 1 / -1; }
     }
 
-    /* アルバム写真編集カード */
-    .album-edit-item {
+    /* ハイライト写真編集カード */
+    .marquee-edit-item {
       border: 1px solid #e2e8f0;
       background: #f8fafc;
       border-radius: 8px;
-      padding: 14px;
-      margin-bottom: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
       display: grid;
-      grid-template-columns: 120px 1fr auto;
-      gap: 14px;
-      align-items: start;
+      grid-template-columns: 110px 1fr auto;
+      gap: 12px;
+      align-items: center;
     }
     @media (max-width: 680px) {
-      .album-edit-item {
-        grid-template-columns: 1fr;
-      }
+      .marquee-edit-item { grid-template-columns: 1fr; }
     }
-    .album-edit-thumb {
-      width: 120px;
-      height: 80px;
+    .marquee-edit-thumb {
+      width: 110px;
+      height: 70px;
       object-fit: cover;
       border-radius: 6px;
       border: 1px solid #cbd5e1;
       background: #e2e8f0;
-    }
-    .album-edit-fields {
-      display: grid;
-      grid-template-columns: 1fr 120px;
-      gap: 8px;
-    }
-    .album-edit-fields .full {
-      grid-column: 1 / -1;
     }
 
     .hint-text {
@@ -237,13 +232,28 @@
       color: #64748b;
       background: #f8fafc;
     }
+    .role-badge {
+      display: inline-block;
+      font-size: 0.74rem;
+      padding: 2px 9px;
+      border-radius: 99px;
+      font-weight: 600;
+    }
+    .role-badge.admin {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    .role-badge.album {
+      background: #fef3c7;
+      color: #92400e;
+    }
     .self-tag {
       display: inline-block;
       font-size: 0.72rem;
       padding: 2px 8px;
       border-radius: 99px;
-      background: #dbeafe;
-      color: #1e40af;
+      background: #e2e8f0;
+      color: #334155;
       margin-left: 6px;
       font-weight: 600;
     }
@@ -273,7 +283,7 @@
   <div id="auth-view" class="auth-box">
     <h1 style="margin-bottom: 10px;">管理者ログイン</h1>
     <p style="font-size: 0.84rem; color: #64748b; margin-bottom: 18px;">
-      管理者ユーザーIDとパスワードを入力してください。
+      サイト全体管理者のユーザーIDとパスワードを入力してください。
     </p>
     <div style="margin-bottom: 12px;">
       <label for="userid-input">ユーザー名（ID）</label>
@@ -352,17 +362,14 @@
       </div>
     </div>
 
-    <!-- 思い出アルバム写真管理カード -->
+    <!-- メインページ常時アニメーション写真管理（アルバムとは別管理） -->
     <div class="card">
-      <h2>
-        <span>思い出のアルバム写真管理</span>
-        <a href="/album.html" target="_blank" style="font-size: 0.82rem; color: #1d4ed8; text-decoration: none;">アルバムページを開く ↗</a>
-      </h2>
+      <h2>メインページ 常時アニメーション写真（ハイライト表示用）</h2>
       <p class="hint-text">
-        ※ GitHubリポジトリにアップロードした画像パス（例: <code>./photo1.jpg</code>）または画像URLを指定すると、メインページのアニメーションと専用アルバムページの両方に自動反映されます。
+        ※ ここで設定した写真は、思い出のアルバムとは別に、メインページ上で常に横スクロールアニメーションで表示されます（アルバムの投稿・編集は <code>/album.html</code> 側で行います）。
       </p>
-      <div id="album-editor-container"></div>
-      <button class="btn btn-secondary" id="add-album-btn">+ 写真を追加</button>
+      <div id="marquee-editor-container"></div>
+      <button class="btn btn-secondary" id="add-marquee-btn">+ ハイライト写真を追加</button>
     </div>
 
     <div class="card">
@@ -412,12 +419,12 @@
     </div>
   </div>
 
-  <!-- 3. 管理者ユーザーアカウント管理画面 -->
+  <!-- 3. ユーザーアカウント管理画面（全体管理者／アルバム編集者の権限分離登録） -->
   <div id="users-view" class="container" style="display: none;">
     <div class="header">
       <div class="header-left">
-        <h1>管理者ユーザーアカウント管理</h1>
-        <span class="user-badge">登録したユーザーは他のPC・端末からも同じID・パスワードでログインできます</span>
+        <h1>ユーザーアカウント管理</h1>
+        <span class="user-badge">「サイト全体管理者」と「アルバム編集者」の権限を分けて登録できます</span>
       </div>
       <div>
         <button class="btn btn-secondary" id="back-admin-btn">← サイト管理画面へ戻る</button>
@@ -427,31 +434,42 @@
     <div id="user-status-msg" class="status-msg"></div>
 
     <div class="card">
-      <h2>新規管理者ユーザーの登録</h2>
-      <div class="grid-3" style="margin-bottom: 14px;">
+      <h2>新規ユーザーの登録</h2>
+      <div class="grid-4" style="margin-bottom: 14px;">
         <div>
-          <label>新しいユーザー名（ID） *</label>
-          <input type="text" id="new-user-id" placeholder="半角英数字（例: teacher01）">
+          <label>権限（役割） *</label>
+          <select id="new-user-role">
+            <option value="album_editor">アルバム編集者（投稿・編集のみ）</option>
+            <option value="admin">サイト全体管理者（全設定＋アルバム）</option>
+          </select>
         </div>
         <div>
-          <label>表示名（任意）</label>
-          <input type="text" id="new-user-label" placeholder="例: 3学年担当">
+          <label>ユーザー名（ID） *</label>
+          <input type="text" id="new-user-id" placeholder="半角英数字">
         </div>
         <div>
-          <label>ログインパスワード *</label>
+          <label>表示名（投稿者名にも表示）</label>
+          <input type="text" id="new-user-label" placeholder="例: アルバム委員">
+        </div>
+        <div>
+          <label>パスワード *</label>
           <input type="password" id="new-user-pass" placeholder="パスワードを設定">
         </div>
       </div>
+      <p class="hint-text">
+        ※「アルバム編集者」として登録したユーザーは、<code>/album.html</code> からの写真投稿・編集のみ可能で、このサイト全体管理画面にはアクセスできません。
+      </p>
       <button class="btn btn-primary" id="add-user-btn">このユーザーを登録する</button>
     </div>
 
     <div class="card">
-      <h2>登録済み管理者ユーザー一覧</h2>
+      <h2>登録済みユーザー一覧</h2>
       <table class="user-list">
         <thead>
           <tr>
             <th>ユーザー名（ID）</th>
             <th>表示名</th>
+            <th>権限</th>
             <th style="text-align: right;">操作</th>
           </tr>
         </thead>
@@ -485,12 +503,10 @@
       ],
       extraSchoolDays: ["2027-02-02", "2027-02-26", "2027-02-28"],
       extraOffDays: ["2026-11-25"],
-      albumPhotos: [
+      marqueePhotos: [
         {
           src: "./DSC08109.jpg",
-          date: "2026.04",
-          title: "3年次のスタート・学び舎の風景",
-          caption: "澄み渡る青空のもと、高校生活最後の1年が始まりました。"
+          title: "北海道滝川西高等学校 校舎風景"
         }
       ],
       milestones: [
@@ -586,23 +602,21 @@
       document.getElementById("admin-school-days-preview").textContent = `今日からの残り登校日数: ${remCount}日`;
     }
 
-    function renderAlbumEditor() {
-      if (!Array.isArray(config.albumPhotos)) {
-        config.albumPhotos = structuredClone(DEFAULT_CONFIG.albumPhotos);
+    function renderMarqueeEditor() {
+      if (!Array.isArray(config.marqueePhotos)) {
+        config.marqueePhotos = structuredClone(DEFAULT_CONFIG.marqueePhotos);
       }
-      const container = document.getElementById("album-editor-container");
+      const container = document.getElementById("marquee-editor-container");
       container.innerHTML = "";
 
-      config.albumPhotos.forEach((photo, idx) => {
+      config.marqueePhotos.forEach((photo, idx) => {
         const item = document.createElement("div");
-        item.className = "album-edit-item";
+        item.className = "marquee-edit-item";
         item.innerHTML = `
-          <img src="${photo.src || ''}" alt="" class="album-edit-thumb">
-          <div class="album-edit-fields">
-            <input type="text" value="${photo.title || ''}" data-field="title" placeholder="タイトル（例: 学校祭・体育祭）">
-            <input type="text" value="${photo.date || ''}" data-field="date" placeholder="時期（例: 2026.07）">
-            <input type="text" class="full" value="${photo.src || ''}" data-field="src" placeholder="画像パス（例: ./photo1.jpg）">
-            <input type="text" class="full" value="${photo.caption || ''}" data-field="caption" placeholder="思い出のコメント・説明文">
+          <img src="${photo.src || ''}" alt="" class="marquee-edit-thumb">
+          <div style="display: grid; gap: 6px;">
+            <input type="text" value="${photo.src || ''}" data-field="src" placeholder="画像パス（例: ./DSC08109.jpg）">
+            <input type="text" value="${photo.title || ''}" data-field="title" placeholder="キャプション（例: 校舎風景）">
           </div>
           <button class="btn btn-danger">削除</button>
         `;
@@ -610,26 +624,18 @@
         const thumb = item.querySelector("img");
         const srcInput = item.querySelector('input[data-field="src"]');
         const titleInput = item.querySelector('input[data-field="title"]');
-        const dateInput = item.querySelector('input[data-field="date"]');
-        const captionInput = item.querySelector('input[data-field="caption"]');
 
         srcInput.addEventListener("change", () => {
-          config.albumPhotos[idx].src = srcInput.value.trim();
-          thumb.src = config.albumPhotos[idx].src;
+          config.marqueePhotos[idx].src = srcInput.value.trim();
+          thumb.src = config.marqueePhotos[idx].src;
         });
         titleInput.addEventListener("change", () => {
-          config.albumPhotos[idx].title = titleInput.value;
-        });
-        dateInput.addEventListener("change", () => {
-          config.albumPhotos[idx].date = dateInput.value;
-        });
-        captionInput.addEventListener("change", () => {
-          config.albumPhotos[idx].caption = captionInput.value;
+          config.marqueePhotos[idx].title = titleInput.value;
         });
 
         item.querySelector("button").addEventListener("click", () => {
-          config.albumPhotos.splice(idx, 1);
-          renderAlbumEditor();
+          config.marqueePhotos.splice(idx, 1);
+          renderMarqueeEditor();
         });
 
         container.appendChild(item);
@@ -719,18 +725,28 @@
       const tbody = document.getElementById("users-table-body");
       tbody.innerHTML = "";
 
+      const adminCount = registeredUsers.filter(u => u.role === "admin").length;
+
       registeredUsers.forEach(user => {
         const tr = document.createElement("tr");
         const isSelf = user.id === sessionUserId;
+        const isAdmin = user.role === "admin";
+        const canDelete = !(isAdmin && adminCount <= 1);
+
         tr.innerHTML = `
           <td>
             <strong>${user.id}</strong>
             ${isSelf ? '<span class="self-tag">ログイン中</span>' : ''}
           </td>
           <td>${user.label || user.id}</td>
+          <td>
+            <span class="role-badge ${isAdmin ? 'admin' : 'album'}">
+              ${isAdmin ? 'サイト全体管理者' : 'アルバム編集者'}
+            </span>
+          </td>
           <td style="text-align: right; display: flex; justify-content: flex-end; gap: 6px;">
             <button class="btn btn-secondary btn-sm" data-action="pass">PW変更</button>
-            ${registeredUsers.length > 1 ? '<button class="btn btn-danger" data-action="del">削除</button>' : ''}
+            ${canDelete ? '<button class="btn btn-danger" data-action="del">削除</button>' : ''}
           </td>
         `;
 
@@ -772,7 +788,7 @@
       document.getElementById("graduationDate").value = config.graduationDate;
       document.getElementById("graduationTime").value = config.graduationTime;
       renderMaintenanceUI();
-      renderAlbumEditor();
+      renderMarqueeEditor();
       renderCalendar();
       renderMilestones();
     }
@@ -811,6 +827,17 @@
     }
 
     async function saveConfigToCloud(customSuccessMessage) {
+      // アルバム側で保存された最新データを消さないよう、保存直前に最新のalbumPhotosを取得
+      try {
+        const latestRes = await fetch("/api/config", { cache: "no-store" });
+        if (latestRes.ok) {
+          const latest = await latestRes.json();
+          if (latest && Array.isArray(latest.albumPhotos)) {
+            config.albumPhotos = latest.albumPhotos;
+          }
+        }
+      } catch (_) {}
+
       config.maintenanceMessage = document.getElementById("maintenanceMessage").value;
       config.schoolName = document.getElementById("schoolName").value;
       config.schoolMotto = document.getElementById("schoolMotto").value;
@@ -869,7 +896,7 @@
 
         const authData = await authRes.json();
         if (!authRes.ok) {
-          alert(authData.error || "ユーザーIDまたはパスワードが一致しません。");
+          alert(authData.error || "ログインに失敗しました。");
           return;
         }
 
@@ -891,7 +918,7 @@
         document.getElementById("admin-view").style.display = "block";
         populateForm();
       } catch (_) {
-        alert("サーバー通信エラーが発生しました。Cloudflare KVのバインド設定を確認してください。");
+        alert("サーバー通信エラーが発生しました。");
       }
     });
 
@@ -908,16 +935,19 @@
     });
 
     document.getElementById("add-user-btn").addEventListener("click", async () => {
+      const newRole = document.getElementById("new-user-role").value;
       const newUserId = document.getElementById("new-user-id").value.trim();
       const newLabel = document.getElementById("new-user-label").value.trim();
       const newPassword = document.getElementById("new-user-pass").value.trim();
 
+      const roleName = newRole === "admin" ? "サイト全体管理者" : "アルバム編集者";
       const ok = await manageUsersRequest({
         subAction: "add",
+        newRole,
         newUserId,
         newLabel,
         newPassword
-      }, `新しい管理者ユーザー「${newUserId}」を登録しました。他のPCからもログイン可能です。`);
+      }, `新しい${roleName}「${newUserId}」を登録しました。`);
 
       if (ok) {
         document.getElementById("new-user-id").value = "";
@@ -942,14 +972,12 @@
       }
     });
 
-    document.getElementById("add-album-btn").addEventListener("click", () => {
-      config.albumPhotos.push({
+    document.getElementById("add-marquee-btn").addEventListener("click", () => {
+      config.marqueePhotos.push({
         src: "./DSC08109.jpg",
-        date: "2026.11",
-        title: "新しい思い出",
-        caption: ""
+        title: "新しいハイライト写真"
       });
-      renderAlbumEditor();
+      renderMarqueeEditor();
     });
 
     document.getElementById("prev-month").addEventListener("click", () => {
