@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>このサイトについて | 卒業への軌跡 ― 旅立ちのカウントダウン</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@500;700&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #0a101d;
+      --bg-accent: #1d1427;
+      --gold: #d4af37;
+      --gold-light: #f3e5ab;
+      --text-main: #f4f5f7;
+      --text-sub: #b4becd;
+      --card-bg: rgba(13, 20, 36, 0.72);
+      --card-border: rgba(212, 175, 55, 0.28);
+    }
+
+    body[data-theme="sakura"] {
+      --bg-base: #1b1018;
+      --bg-accent: #341728;
+      --gold: #f2a6b8;
+      --gold-light: #ffe0e8;
+      --card-bg: rgba(31, 16, 26, 0.72);
+      --card-border: rgba(242, 166, 184, 0.32);
+    }
+
+    body[data-theme="emerald"] {
+      --bg-base: #091615;
+      --bg-accent: #112926;
+      --gold: #c5a86a;
+      --gold-light: #efe3c2;
+      --card-bg: rgba(11, 25, 24, 0.72);
+      --card-border: rgba(197, 168, 106, 0.32);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.8;
+    }
+
+    .ambient-campus {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 35%, var(--bg-accent) 0%, var(--bg-base) 80%);
+    }
+
+    .ambient-campus-img {
+      position: absolute;
+      inset: -3%;
+      width: 106%;
+      height: 106%;
+      object-fit: cover;
+      object-position: center 42%;
+      opacity: 0.28;
+      filter: contrast(1.05) saturate(0.85) brightness(0.72);
+    }
+
+    .ambient-campus::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 45%, rgba(10, 16, 29, 0.3) 0%, var(--bg-base) 88%),
+        linear-gradient(180deg, rgba(10, 16, 29, 0.6) 0%, rgba(10, 16, 29, 0.25) 45%, var(--bg-base) 96%);
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 48px 20px 40px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .sub-en {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.32em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-family: 'Shippori Mincho', serif;
+      font-size: clamp(1.6rem, 3.8vw, 2.3rem);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      background: linear-gradient(135deg, #fff 20%, var(--gold-light) 60%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(14px);
+      border-radius: 14px;
+      padding: 28px 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.42);
+    }
+
+    .card h2 {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1.2rem;
+      color: var(--gold-light);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card h2::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 18px;
+      background: var(--gold);
+      border-radius: 2px;
+    }
+
+    .card p {
+      font-size: 0.95rem;
+      color: var(--text-main);
+      margin-bottom: 12px;
+    }
+
+    .card p:last-child {
+      margin-bottom: 0;
+    }
+
+    .info-list {
+      list-style: none;
+      margin-top: 12px;
+    }
+
+    .info-list li {
+      position: relative;
+      padding-left: 18px;
+      margin-bottom: 10px;
+      font-size: 0.93rem;
+      color: var(--text-main);
+    }
+
+    .info-list li::before {
+      content: "・";
+      position: absolute;
+      left: 0;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .domain-box {
+      background: rgba(212, 175, 55, 0.08);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .domain-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--gold-light);
+    }
+
+    .domain-tag {
+      font-size: 0.78rem;
+      padding: 3px 10px;
+      border-radius: 99px;
+      background: rgba(212, 175, 55, 0.2);
+      color: var(--gold-light);
+    }
+
+    .back-area {
+      text-align: center;
+      margin-top: 32px;
+    }
+
+    .btn-back {
+      display: inline-block;
+      padding: 11px 28px;
+      border-radius: 99px;
+      border: 1px solid var(--gold);
+      background: rgba(212, 175, 55, 0.12);
+      color: var(--gold-light);
+      text-decoration: none;
+      font-family: 'Shippori Mincho', serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.1em;
+      transition: background 0.25s ease, transform 0.2s ease;
+    }
+
+    .btn-back:hover {
+      background: rgba(212, 175, 55, 0.25);
+      transform: translateY(-1px);
+    }
+
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-sub);
+    }
+  </style>
+</head>
+<body data-theme="navy">
+  <div class="ambient-campus" aria-hidden="true">
+    <img src="./DSC08109.jpg" alt="" class="ambient-campus-img" id="campus-bg-img">
+  </div>
+
+  <div class="wrapper">
+    <header>
+      <div class="sub-en">About This Website</div>
+      <h1>このサイトについて</h1>
+    </header>
+
+    <section class="card">
+      <h2>このサイトの説明</h2>
+      <p>
+        本サイトは、令和8年度（2026年度）の卒業を迎える生徒に向けて、卒業証書授与式までの残り日数および残り登校日数をリアルタイムで案内するカウントダウンWebページです。
+      </p>
+      <p>
+        年間行事予定表に基づき、土日祝日・夏季休業・冬季休業・家庭学習期間などを除外した実際の登校日数を自動算出しています。また、行事予定の変更や臨時登校日などが発生した際も、管理画面からの更新によって全端末へ最新の日程が即座に反映される仕組みを備えています。
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>サイトの安全性について</h2>
+      <p>
+        閲覧される生徒・保護者の皆さまに安心してご利用いただけるよう、セキュリティとプライバシー保護に配慮した設計を行っています。
+      </p>
+      <ul class="info-list">
+        <li><strong>個人情報の非収集：</strong>氏名・学籍番号・メールアドレス・位置情報などの個人を特定できる情報は一切取得・保存していません。</li>
+        <li><strong>通信の暗号化（HTTPS）：</strong>すべての通信はSSL/TLSによって暗号化されており、第三者による盗聴や改ざんを防止しています。</li>
+        <li><strong>広告・外部トラッキングなし：</strong>第三者による広告配信や行動追跡スクリプトは組み込んでいません。</li>
+        <li><strong>安全なホスティング基盤：</strong>世界的なクラウドインフラである Cloudflare Pages 上で稼働しており、高い安定性と不正アクセス対策を備えています。</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>サイトで使用しているドメインについて</h2>
+      <p>
+        本サイトで使用している以下のドメインは、本サイトの管理者が正規に取得・管理している独自ドメインです。
+      </p>
+      <div class="domain-box">
+        <span class="domain-name">md-hokkaido.com</span>
+        <span class="domain-tag">管理者保有 独自ドメイン</span>
+      </div>
+      <p>
+        不審な外部サイトやフィッシングサイトではなく、本サイトの公開・運用のために管理者が管理しているドメインですので、安心してアクセスしてください。
+      </p>
+    </section>
+
+    <div class="back-area">
+      <a href="/" class="btn-back">カウントダウン画面へ戻る</a>
+    </div>
+
+    <footer>
+      <p id="school-footer">北海道滝川西高等学校 令和8年度 卒業カウントダウン</p>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById("campus-bg-img").addEventListener("error", (e) => {
+      e.target.style.display = "none";
+    });
+
+    // メインページで設定されているテーマカラーを自動同期
+    async function syncTheme() {
+      try {
+        const res = await fetch("/api/config", { cache: "no-store" });
+        if (!res.ok) return;
+        const remote = await res.json();
+        if (remote && remote.theme) {
+          document.body.dataset.theme = remote.theme;
+        }
+        if (remote && remote.schoolName) {
+          document.getElementById("school-footer").textContent =
+            `${remote.schoolName} 令和8年度 卒業カウントダウン`;
+        }
+      } catch (_) {}
+    }
+
+    syncTheme();
+  </script>
+</body>
+</html>
