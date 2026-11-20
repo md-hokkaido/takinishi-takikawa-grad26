@@ -36,6 +36,37 @@
       margin-bottom: 16px;
       padding-bottom: 8px;
       border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .maint-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      margin-bottom: 14px;
+    }
+    .maint-banner.is-active {
+      background: #fef2f2;
+      border-color: #fca5a5;
+    }
+    .maint-status {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .maint-banner.is-active .maint-status {
+      color: #b91c1c;
+    }
+    .maint-banner:not(.is-active) .maint-status {
+      color: #15803d;
     }
     .grid-2 {
       display: grid;
@@ -50,12 +81,13 @@
       color: #475569;
       margin-bottom: 4px;
     }
-    input, select {
+    input, select, textarea {
       width: 100%;
       padding: 8px 10px;
       border: 1px solid #cbd5e1;
       border-radius: 6px;
       font-size: 0.92rem;
+      font-family: inherit;
     }
     .btn {
       padding: 9px 18px;
@@ -70,6 +102,10 @@
     .btn-primary { background: #1d4ed8; color: #fff; }
     .btn-primary:hover { background: #1e40af; }
     .btn-secondary { background: #e2e8f0; color: #334155; }
+    .btn-warning { background: #dc2626; color: #fff; }
+    .btn-warning:hover { background: #b91c1c; }
+    .btn-success { background: #16a34a; color: #fff; }
+    .btn-success:hover { background: #15803d; }
     .btn-danger { background: #fee2e2; color: #b91c1c; padding: 8px 12px; font-size: 0.82rem; }
     .cal-controls {
       display: flex;
@@ -124,12 +160,8 @@
         border: 1px solid #e2e8f0;
         border-radius: 8px;
       }
-      .milestone-row input[type="text"] {
-        grid-column: 1 / -1;
-      }
-      .milestone-row button {
-        grid-column: 1 / -1;
-      }
+      .milestone-row input[type="text"] { grid-column: 1 / -1; }
+      .milestone-row button { grid-column: 1 / -1; }
     }
     .hint-text {
       font-size: 0.8rem;
@@ -182,6 +214,24 @@
     </div>
 
     <div id="status-msg" class="status-msg"></div>
+
+    <!-- メンテナンスモード切り替えカード -->
+    <div class="card">
+      <h2>サイト公開状態・メンテナンス切り替え</h2>
+      <div class="maint-banner" id="maint-banner">
+        <div>
+          <div class="maint-status" id="maint-status-text">現在：通常公開中</div>
+          <p style="font-size: 0.82rem; color: #475569; margin-top: 2px;" id="maint-desc-text">
+            一般閲覧者にカウントダウンページが表示されています。
+          </p>
+        </div>
+        <button class="btn btn-warning" id="toggle-maint-btn">メンテナンスモードにする</button>
+      </div>
+      <div>
+        <label>メンテナンス中に閲覧者へ表示するメッセージ</label>
+        <textarea id="maintenanceMessage" rows="2"></textarea>
+      </div>
+    </div>
 
     <div class="card">
       <h2>基本表示・デザイン設定</h2>
@@ -236,7 +286,10 @@
     </div>
 
     <div class="card">
-      <h2>登校日カレンダー調整（クリックで登校 / 休校を切替）</h2>
+      <h2>
+        <span>登校日カレンダー調整（クリックで登校 / 休校を切替）</span>
+        <span id="admin-school-days-preview" style="color: #1d4ed8; font-size: 0.9rem;"></span>
+      </h2>
       <div class="cal-controls">
         <button class="btn btn-secondary" id="prev-month">前月</button>
         <strong id="cal-month-label">2026年11月</strong>
@@ -263,6 +316,8 @@
 
   <script>
     const DEFAULT_CONFIG = {
+      maintenanceMode: false,
+      maintenanceMessage: "ただいまサイトの更新・調整作業を行っております。\n作業が完了するまで、しばらくお待ちください。",
       schoolMotto: "志あるものは事ついに成る",
       schoolName: "北海道滝川西高等学校",
       pageTitle: "卒業への軌跡 ― 旅立ちのカウントダウン",
@@ -300,7 +355,7 @@
     let config = structuredClone(DEFAULT_CONFIG);
     let sessionPasscode = "";
     let calYear = 2026;
-    let calMonth = 10; // 0-indexed (10 = 11月)
+    let calMonth = 10;
 
     function formatYMD(y, m, d) {
       return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
@@ -361,6 +416,19 @@
         cell.addEventListener("click", () => toggleDateState(ymd, dow));
         grid.appendChild(cell);
       }
+
+      const now = new Date();
+      let cursor = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const gradStr = document.getElementById("graduationDate").value || config.graduationDate;
+      const [gy, gm, gd] = gradStr.split("-").map(Number);
+      const grad = new Date(gy, gm - 1, gd);
+      let remCount = 0;
+      while (cursor <= grad) {
+        const ymd = formatYMD(cursor.getFullYear(), cursor.getMonth(), cursor.getDate());
+        if (isSchoolDay(ymd, cursor.getDay())) remCount++;
+        cursor.setDate(cursor.getDate() + 1);
+      }
+      document.getElementById("admin-school-days-preview").textContent = `今日からの残り登校日数: ${remCount}日`;
     }
 
     function normalizeMilestones() {
@@ -421,7 +489,30 @@
       });
     }
 
+    function renderMaintenanceUI() {
+      const banner = document.getElementById("maint-banner");
+      const statusText = document.getElementById("maint-status-text");
+      const descText = document.getElementById("maint-desc-text");
+      const btn = document.getElementById("toggle-maint-btn");
+
+      if (config.maintenanceMode) {
+        banner.classList.add("is-active");
+        statusText.textContent = "現在：メンテナンス中（閲覧制限中）";
+        descText.textContent = "一般閲覧者には「メンテナンス中」画面のみが表示されています。";
+        btn.textContent = "メンテナンスを解除して公開する";
+        btn.className = "btn btn-success";
+      } else {
+        banner.classList.remove("is-active");
+        statusText.textContent = "現在：通常公開中";
+        descText.textContent = "一般閲覧者にカウントダウンページが表示されています。";
+        btn.textContent = "メンテナンスモードにする";
+        btn.className = "btn btn-warning";
+      }
+    }
+
     function populateForm() {
+      document.getElementById("maintenanceMessage").value =
+        config.maintenanceMessage || DEFAULT_CONFIG.maintenanceMessage;
       document.getElementById("schoolName").value = config.schoolName;
       document.getElementById("schoolMotto").value = config.schoolMotto;
       document.getElementById("pageTitle").value = config.pageTitle;
@@ -431,6 +522,7 @@
       document.getElementById("graduationDate").value = config.graduationDate;
       document.getElementById("graduationTime").value = config.graduationTime;
       document.getElementById("newPasscode").value = sessionPasscode;
+      renderMaintenanceUI();
       renderCalendar();
       renderMilestones();
     }
@@ -441,50 +533,8 @@
       el.className = `status-msg ${isOk ? "ok" : "err"}`;
     }
 
-    document.getElementById("login-btn").addEventListener("click", async () => {
-      const inputPass = document.getElementById("passcode-input").value.trim();
-      if (!inputPass) return;
-
-      try {
-        const res = await fetch("/api/config", { cache: "no-store" });
-        if (res.ok) {
-          const remote = await res.json();
-          if (remote && Object.keys(remote).length > 0) {
-            config = { ...DEFAULT_CONFIG, ...remote };
-          }
-        }
-      } catch (_) {}
-
-      const validPass = config.passcode || "takikawa2026";
-      if (inputPass !== validPass) {
-        alert("パスコードが一致しません。");
-        return;
-      }
-
-      sessionPasscode = inputPass;
-      document.getElementById("auth-view").style.display = "none";
-      document.getElementById("admin-view").style.display = "block";
-      populateForm();
-    });
-
-    document.getElementById("prev-month").addEventListener("click", () => {
-      calMonth--;
-      if (calMonth < 0) { calMonth = 11; calYear--; }
-      renderCalendar();
-    });
-
-    document.getElementById("next-month").addEventListener("click", () => {
-      calMonth++;
-      if (calMonth > 11) { calMonth = 0; calYear++; }
-      renderCalendar();
-    });
-
-    document.getElementById("add-milestone-btn").addEventListener("click", () => {
-      config.milestones.push({ startDate: "2027-02-20", endDate: "2027-02-20", title: "新規行事" });
-      renderMilestones();
-    });
-
-    document.getElementById("save-btn").addEventListener("click", async () => {
+    async function saveConfigToCloud(customSuccessMessage) {
+      config.maintenanceMessage = document.getElementById("maintenanceMessage").value;
       config.schoolName = document.getElementById("schoolName").value;
       config.schoolMotto = document.getElementById("schoolMotto").value;
       config.pageTitle = document.getElementById("pageTitle").value;
@@ -513,14 +563,81 @@
         const result = await res.json();
         if (!res.ok) {
           showStatus(result.error || "保存に失敗しました。", false);
-          return;
+          return false;
         }
 
         if (updatedPass) sessionPasscode = updatedPass;
-        showStatus("保存が完了しました。他のPC・スマートフォンにも最新の設定が反映されます。", true);
+        showStatus(customSuccessMessage || "保存が完了しました。他のPC・スマートフォンにも最新の設定が反映されます。", true);
+        return true;
       } catch (err) {
         showStatus("サーバー通信エラーが発生しました。Cloudflare KVのバインド設定を確認してください。", false);
+        return false;
       }
+    }
+
+    document.getElementById("login-btn").addEventListener("click", async () => {
+      const inputPass = document.getElementById("passcode-input").value.trim();
+      if (!inputPass) return;
+
+      try {
+        const res = await fetch("/api/config", { cache: "no-store" });
+        if (res.ok) {
+          const remote = await res.json();
+          if (remote && Object.keys(remote).length > 0) {
+            config = { ...DEFAULT_CONFIG, ...remote };
+          }
+        }
+      } catch (_) {}
+
+      const validPass = config.passcode || "takikawa2026";
+      if (inputPass !== validPass) {
+        alert("パスコードが一致しません。");
+        return;
+      }
+
+      sessionPasscode = inputPass;
+      document.getElementById("auth-view").style.display = "none";
+      document.getElementById("admin-view").style.display = "block";
+      populateForm();
+    });
+
+    document.getElementById("toggle-maint-btn").addEventListener("click", async () => {
+      const nextState = !config.maintenanceMode;
+      config.maintenanceMode = nextState;
+      renderMaintenanceUI();
+
+      const msg = nextState
+        ? "メンテナンスモードを有効にしました。解除するまで一般閲覧者にはメンテナンス画面が表示されます。"
+        : "メンテナンスモードを解除し、通常公開に戻しました。";
+
+      const ok = await saveConfigToCloud(msg);
+      if (!ok) {
+        config.maintenanceMode = !nextState;
+        renderMaintenanceUI();
+      }
+    });
+
+    document.getElementById("prev-month").addEventListener("click", () => {
+      calMonth--;
+      if (calMonth < 0) { calMonth = 11; calYear--; }
+      renderCalendar();
+    });
+
+    document.getElementById("next-month").addEventListener("click", () => {
+      calMonth++;
+      if (calMonth > 11) { calMonth = 0; calYear++; }
+      renderCalendar();
+    });
+
+    document.getElementById("graduationDate").addEventListener("change", renderCalendar);
+
+    document.getElementById("add-milestone-btn").addEventListener("click", () => {
+      config.milestones.push({ startDate: "2027-02-20", endDate: "2027-02-20", title: "新規行事" });
+      renderMilestones();
+    });
+
+    document.getElementById("save-btn").addEventListener("click", () => {
+      saveConfigToCloud();
     });
   </script>
 </body>
