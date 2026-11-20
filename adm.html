@@ -22,6 +22,15 @@
       flex-wrap: wrap;
       gap: 12px;
     }
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .user-badge {
+      font-size: 0.78rem;
+      color: #475569;
+    }
     h1 { font-size: 1.35rem; font-weight: 700; }
     .card {
       background: #fff;
@@ -62,18 +71,21 @@
       font-weight: 700;
       font-size: 1rem;
     }
-    .maint-banner.is-active .maint-status {
-      color: #b91c1c;
-    }
-    .maint-banner:not(.is-active) .maint-status {
-      color: #15803d;
-    }
+    .maint-banner.is-active .maint-status { color: #b91c1c; }
+    .maint-banner:not(.is-active) .maint-status { color: #15803d; }
     .grid-2 {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 14px;
     }
-    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 640px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
     label {
       display: block;
       font-size: 0.82rem;
@@ -90,10 +102,10 @@
       font-family: inherit;
     }
     .btn {
-      padding: 9px 18px;
+      padding: 9px 16px;
       border: none;
       border-radius: 6px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 600;
       cursor: pointer;
       text-decoration: none;
@@ -102,11 +114,16 @@
     .btn-primary { background: #1d4ed8; color: #fff; }
     .btn-primary:hover { background: #1e40af; }
     .btn-secondary { background: #e2e8f0; color: #334155; }
+    .btn-secondary:hover { background: #cbd5e1; }
+    .btn-dark { background: #334155; color: #fff; }
+    .btn-dark:hover { background: #1e293b; }
     .btn-warning { background: #dc2626; color: #fff; }
     .btn-warning:hover { background: #b91c1c; }
     .btn-success { background: #16a34a; color: #fff; }
     .btn-success:hover { background: #15803d; }
-    .btn-danger { background: #fee2e2; color: #b91c1c; padding: 8px 12px; font-size: 0.82rem; }
+    .btn-danger { background: #fee2e2; color: #b91c1c; padding: 6px 12px; font-size: 0.8rem; }
+    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
     .cal-controls {
       display: flex;
       align-items: center;
@@ -136,6 +153,7 @@
     .cal-day.school { background: #eff6ff; border-color: #93c5fd; color: #1e3a8a; font-weight: 600; }
     .cal-day.off { background: #f8fafc; color: #94a3b8; }
     .cal-day small { display: block; font-size: 0.68rem; }
+
     .milestone-head {
       display: grid;
       grid-template-columns: 145px 145px 1fr 64px;
@@ -168,8 +186,36 @@
       color: #64748b;
       margin-bottom: 12px;
     }
+
+    /* ユーザー管理テーブル */
+    .user-list {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .user-list th, .user-list td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.9rem;
+    }
+    .user-list th {
+      font-size: 0.8rem;
+      color: #64748b;
+      background: #f8fafc;
+    }
+    .self-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: #dbeafe;
+      color: #1e40af;
+      margin-left: 6px;
+      font-weight: 600;
+    }
+
     .auth-box {
-      max-width: 380px;
+      max-width: 400px;
       margin: 80px auto;
       background: #fff;
       padding: 28px;
@@ -189,14 +235,19 @@
 </head>
 <body>
 
+  <!-- 1. ログイン画面（ユーザーID + パスワード） -->
   <div id="auth-view" class="auth-box">
-    <h1 style="margin-bottom: 12px;">管理者認証</h1>
-    <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px;">
-      設定を変更するには管理者パスコードを入力してください。
+    <h1 style="margin-bottom: 10px;">管理者ログイン</h1>
+    <p style="font-size: 0.84rem; color: #64748b; margin-bottom: 18px;">
+      管理者ユーザーIDとパスワードを入力してください。
     </p>
-    <div style="margin-bottom: 14px;">
-      <label for="passcode-input">パスコード</label>
-      <input type="password" id="passcode-input" placeholder="パスコードを入力">
+    <div style="margin-bottom: 12px;">
+      <label for="userid-input">ユーザー名（ID）</label>
+      <input type="text" id="userid-input" placeholder="例: admin" autocomplete="username">
+    </div>
+    <div style="margin-bottom: 18px;">
+      <label for="passcode-input">パスワード</label>
+      <input type="password" id="passcode-input" placeholder="パスワードを入力" autocomplete="current-password">
     </div>
     <button class="btn btn-primary" style="width: 100%;" id="login-btn">ログイン</button>
     <div style="margin-top: 14px; text-align: center;">
@@ -204,10 +255,15 @@
     </div>
   </div>
 
+  <!-- 2. メイン管理者ページ -->
   <div id="admin-view" class="container" style="display: none;">
     <div class="header">
-      <h1>カウントダウンサイト管理</h1>
-      <div style="display: flex; gap: 8px;">
+      <div class="header-left">
+        <h1>カウントダウンサイト管理</h1>
+        <span class="user-badge" id="logged-in-badge">ログイン中: -</span>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="btn btn-dark" id="open-users-btn">ユーザーアカウント管理</button>
         <a href="/" class="btn btn-secondary">公開ページを確認</a>
         <button class="btn btn-primary" id="save-btn">全端末に上書き保存</button>
       </div>
@@ -215,7 +271,6 @@
 
     <div id="status-msg" class="status-msg"></div>
 
-    <!-- メンテナンスモード切り替えカード -->
     <div class="card">
       <h2>サイト公開状態・メンテナンス切り替え</h2>
       <div class="maint-banner" id="maint-banner">
@@ -264,8 +319,8 @@
     </div>
 
     <div class="card">
-      <h2>基準日・卒業式日時・パスコード</h2>
-      <div class="grid-2">
+      <h2>基準日・卒業式日時</h2>
+      <div class="grid-3">
         <div>
           <label>3年次 始業式（進捗バー開始日）</label>
           <input type="date" id="startDate">
@@ -277,10 +332,6 @@
         <div>
           <label>卒業式 開始時刻</label>
           <input type="time" id="graduationTime">
-        </div>
-        <div>
-          <label>管理者パスコード（変更する場合のみ上書き）</label>
-          <input type="text" id="newPasscode">
         </div>
       </div>
     </div>
@@ -314,6 +365,54 @@
     </div>
   </div>
 
+  <!-- 3. さらに奥のページ：管理者ユーザーアカウント管理画面 -->
+  <div id="users-view" class="container" style="display: none;">
+    <div class="header">
+      <div class="header-left">
+        <h1>管理者ユーザーアカウント管理</h1>
+        <span class="user-badge">登録したユーザーは他のPC・端末からも同じID・パスワードでログインできます</span>
+      </div>
+      <div>
+        <button class="btn btn-secondary" id="back-admin-btn">← サイト管理画面へ戻る</button>
+      </div>
+    </div>
+
+    <div id="user-status-msg" class="status-msg"></div>
+
+    <div class="card">
+      <h2>新規管理者ユーザーの登録</h2>
+      <div class="grid-3" style="margin-bottom: 14px;">
+        <div>
+          <label>新しいユーザー名（ID） *</label>
+          <input type="text" id="new-user-id" placeholder="半角英数字（例: teacher01）">
+        </div>
+        <div>
+          <label>表示名（任意）</label>
+          <input type="text" id="new-user-label" placeholder="例: 3学年担当">
+        </div>
+        <div>
+          <label>ログインパスワード *</label>
+          <input type="password" id="new-user-pass" placeholder="パスワードを設定">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="add-user-btn">このユーザーを登録する</button>
+    </div>
+
+    <div class="card">
+      <h2>登録済み管理者ユーザー一覧</h2>
+      <table class="user-list">
+        <thead>
+          <tr>
+            <th>ユーザー名（ID）</th>
+            <th>表示名</th>
+            <th style="text-align: right;">操作</th>
+          </tr>
+        </thead>
+        <tbody id="users-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
   <script>
     const DEFAULT_CONFIG = {
       maintenanceMode: false,
@@ -326,7 +425,6 @@
       startDate: "2026-04-08",
       graduationDate: "2027-03-01",
       graduationTime: "10:00",
-      passcode: "takikawa2026",
       holidayRanges: [
         { label: "夏季休業", start: "2026-07-24", end: "2026-08-18" },
         { label: "冬季休業", start: "2026-12-24", end: "2027-01-12" },
@@ -353,7 +451,9 @@
     };
 
     let config = structuredClone(DEFAULT_CONFIG);
-    let sessionPasscode = "";
+    let sessionUserId = "";
+    let sessionPassword = "";
+    let registeredUsers = [];
     let calYear = 2026;
     let calMonth = 10;
 
@@ -510,6 +610,51 @@
       }
     }
 
+    function renderUsersTable() {
+      const tbody = document.getElementById("users-table-body");
+      tbody.innerHTML = "";
+
+      registeredUsers.forEach(user => {
+        const tr = document.createElement("tr");
+        const isSelf = user.id === sessionUserId;
+        tr.innerHTML = `
+          <td>
+            <strong>${user.id}</strong>
+            ${isSelf ? '<span class="self-tag">ログイン中</span>' : ''}
+          </td>
+          <td>${user.label || user.id}</td>
+          <td style="text-align: right; display: flex; justify-content: flex-end; gap: 6px;">
+            <button class="btn btn-secondary btn-sm" data-action="pass">PW変更</button>
+            ${registeredUsers.length > 1 ? '<button class="btn btn-danger" data-action="del">削除</button>' : ''}
+          </td>
+        `;
+
+        tr.querySelector('[data-action="pass"]').addEventListener("click", async () => {
+          const nextPw = prompt(`ユーザー「${user.id}」の新しいパスワードを入力してください:`);
+          if (!nextPw || !nextPw.trim()) return;
+          await manageUsersRequest({
+            subAction: "change_password",
+            targetUserId: user.id,
+            newPassword: nextPw.trim()
+          }, `ユーザー「${user.id}」のパスワードを変更しました。`);
+          if (isSelf) sessionPassword = nextPw.trim();
+        });
+
+        const delBtn = tr.querySelector('[data-action="del"]');
+        if (delBtn) {
+          delBtn.addEventListener("click", async () => {
+            if (!confirm(`ユーザー「${user.id}」を削除しますか？`)) return;
+            await manageUsersRequest({
+              subAction: "delete",
+              targetUserId: user.id
+            }, `ユーザー「${user.id}」を削除しました。`);
+          });
+        }
+
+        tbody.appendChild(tr);
+      });
+    }
+
     function populateForm() {
       document.getElementById("maintenanceMessage").value =
         config.maintenanceMessage || DEFAULT_CONFIG.maintenanceMessage;
@@ -521,16 +666,42 @@
       document.getElementById("startDate").value = config.startDate;
       document.getElementById("graduationDate").value = config.graduationDate;
       document.getElementById("graduationTime").value = config.graduationTime;
-      document.getElementById("newPasscode").value = sessionPasscode;
       renderMaintenanceUI();
       renderCalendar();
       renderMilestones();
     }
 
-    function showStatus(msg, isOk) {
-      const el = document.getElementById("status-msg");
+    function showStatus(msg, isOk, targetId = "status-msg") {
+      const el = document.getElementById(targetId);
       el.textContent = msg;
       el.className = `status-msg ${isOk ? "ok" : "err"}`;
+    }
+
+    async function manageUsersRequest(payload, successMsg) {
+      try {
+        const res = await fetch("/api/config", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "manage_users",
+            userId: sessionUserId,
+            password: sessionPassword,
+            ...payload
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showStatus(data.error || "操作に失敗しました。", false, "user-status-msg");
+          return false;
+        }
+        registeredUsers = data.users || [];
+        renderUsersTable();
+        showStatus(successMsg, true, "user-status-msg");
+        return true;
+      } catch (_) {
+        showStatus("サーバー通信エラーが発生しました。", false, "user-status-msg");
+        return false;
+      }
     }
 
     async function saveConfigToCloud(customSuccessMessage) {
@@ -545,17 +716,14 @@
       config.graduationTime = document.getElementById("graduationTime").value;
       normalizeMilestones();
 
-      const updatedPass = document.getElementById("newPasscode").value.trim();
-      if (updatedPass) {
-        config.passcode = updatedPass;
-      }
-
       try {
         const res = await fetch("/api/config", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            passcode: sessionPasscode,
+            action: "save_config",
+            userId: sessionUserId,
+            password: sessionPassword,
             config: config
           })
         });
@@ -566,39 +734,91 @@
           return false;
         }
 
-        if (updatedPass) sessionPasscode = updatedPass;
         showStatus(customSuccessMessage || "保存が完了しました。他のPC・スマートフォンにも最新の設定が反映されます。", true);
         return true;
-      } catch (err) {
-        showStatus("サーバー通信エラーが発生しました。Cloudflare KVのバインド設定を確認してください。", false);
+      } catch (_) {
+        showStatus("サーバー通信エラーが発生しました。", false);
         return false;
       }
     }
 
     document.getElementById("login-btn").addEventListener("click", async () => {
-      const inputPass = document.getElementById("passcode-input").value.trim();
-      if (!inputPass) return;
+      const inputId = document.getElementById("userid-input").value.trim();
+      const inputPw = document.getElementById("passcode-input").value.trim();
+      if (!inputId || !inputPw) {
+        alert("ユーザーIDとパスワードの両方を入力してください。");
+        return;
+      }
 
       try {
-        const res = await fetch("/api/config", { cache: "no-store" });
-        if (res.ok) {
-          const remote = await res.json();
+        const authRes = await fetch("/api/config", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "login",
+            userId: inputId,
+            password: inputPw
+          })
+        });
+
+        const authData = await authRes.json();
+        if (!authRes.ok) {
+          alert(authData.error || "ユーザーIDまたはパスワードが一致しません。");
+          return;
+        }
+
+        const cfgRes = await fetch("/api/config", { cache: "no-store" });
+        if (cfgRes.ok) {
+          const remote = await cfgRes.json();
           if (remote && Object.keys(remote).length > 0) {
             config = { ...DEFAULT_CONFIG, ...remote };
           }
         }
-      } catch (_) {}
 
-      const validPass = config.passcode || "takikawa2026";
-      if (inputPass !== validPass) {
-        alert("パスコードが一致しません。");
-        return;
+        sessionUserId = inputId;
+        sessionPassword = inputPw;
+        registeredUsers = authData.users || [];
+
+        document.getElementById("logged-in-badge").textContent =
+          `ログイン中: ${authData.currentUser.label} (${authData.currentUser.id})`;
+        document.getElementById("auth-view").style.display = "none";
+        document.getElementById("admin-view").style.display = "block";
+        populateForm();
+      } catch (_) {
+        alert("サーバー通信エラーが発生しました。Cloudflare KVのバインド設定を確認してください。");
       }
+    });
 
-      sessionPasscode = inputPass;
-      document.getElementById("auth-view").style.display = "none";
+    // ユーザー管理画面との切り替え
+    document.getElementById("open-users-btn").addEventListener("click", () => {
+      document.getElementById("admin-view").style.display = "none";
+      document.getElementById("users-view").style.display = "block";
+      document.getElementById("user-status-msg").style.display = "none";
+      renderUsersTable();
+    });
+
+    document.getElementById("back-admin-btn").addEventListener("click", () => {
+      document.getElementById("users-view").style.display = "none";
       document.getElementById("admin-view").style.display = "block";
-      populateForm();
+    });
+
+    document.getElementById("add-user-btn").addEventListener("click", async () => {
+      const newUserId = document.getElementById("new-user-id").value.trim();
+      const newLabel = document.getElementById("new-user-label").value.trim();
+      const newPassword = document.getElementById("new-user-pass").value.trim();
+
+      const ok = await manageUsersRequest({
+        subAction: "add",
+        newUserId,
+        newLabel,
+        newPassword
+      }, `新しい管理者ユーザー「${newUserId}」を登録しました。他のPCからもログイン可能です。`);
+
+      if (ok) {
+        document.getElementById("new-user-id").value = "";
+        document.getElementById("new-user-label").value = "";
+        document.getElementById("new-user-pass").value = "";
+      }
     });
 
     document.getElementById("toggle-maint-btn").addEventListener("click", async () => {
