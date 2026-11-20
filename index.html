@@ -74,7 +74,8 @@
       transition: opacity 1.4s ease, transform 3.8s cubic-bezier(0.16, 1, 0.3, 1), filter 1.4s ease;
     }
 
-    body.is-revealed .ambient-campus-img {
+    body.is-revealed .ambient-campus-img,
+    body.is-maintenance .ambient-campus-img {
       opacity: 0.32;
       transform: scale(1);
       filter: contrast(1.05) saturate(0.85) brightness(0.75);
@@ -89,6 +90,80 @@
         linear-gradient(180deg, rgba(10, 16, 29, 0.55) 0%, rgba(10, 16, 29, 0.2) 45%, var(--bg-base) 96%);
     }
 
+    /* メンテナンス専用画面 */
+    .maintenance-screen {
+      display: none;
+      position: relative;
+      z-index: 200;
+      min-height: 100vh;
+      padding: 32px 20px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    body.is-maintenance .maintenance-screen {
+      display: flex;
+    }
+
+    body.is-maintenance .opening-curtain,
+    body.is-maintenance .wrapper {
+      display: none !important;
+    }
+
+    .maintenance-card {
+      max-width: 560px;
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(16px);
+      border-radius: 16px;
+      padding: 40px 28px;
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+    }
+
+    .maintenance-en {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.32em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .maintenance-title {
+      font-family: 'Shippori Mincho', serif;
+      font-size: clamp(1.4rem, 3.5vw, 1.9rem);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: #ffffff;
+      margin-bottom: 16px;
+    }
+
+    .maintenance-line {
+      width: 120px;
+      height: 1px;
+      margin: 0 auto 20px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    .maintenance-msg {
+      font-size: 0.95rem;
+      color: var(--text-main);
+      line-height: 1.85;
+      white-space: pre-wrap;
+      margin-bottom: 24px;
+    }
+
+    .maintenance-school {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      letter-spacing: 0.12em;
+    }
+
+    /* オープニング演出 */
     .opening-curtain {
       position: fixed;
       inset: 0;
@@ -554,6 +629,18 @@
     <img src="./DSC08109.jpg" alt="" class="ambient-campus-img" id="campus-bg-img">
   </div>
 
+  <!-- メンテナンスモード時に表示される画面 -->
+  <div class="maintenance-screen" id="maintenance-screen">
+    <div class="maintenance-card">
+      <div class="maintenance-en">Under Maintenance</div>
+      <h2 class="maintenance-title">現在メンテナンス中です</h2>
+      <div class="maintenance-line"></div>
+      <p class="maintenance-msg" id="maintenance-message">ただいまサイトの更新・調整作業を行っております。
+作業が完了するまで、しばらくお待ちください。</p>
+      <div class="maintenance-school" id="maintenance-school">北海道滝川西高等学校</div>
+    </div>
+  </div>
+
   <div class="opening-curtain" id="opening-curtain">
     <div class="opening-flash"></div>
     <div class="opening-ring"></div>
@@ -642,6 +729,8 @@
 
   <script>
     const DEFAULT_CONFIG = {
+      maintenanceMode: false,
+      maintenanceMessage: "ただいまサイトの更新・調整作業を行っております。\n作業が完了するまで、しばらくお待ちください。",
       schoolMotto: "志あるものは事ついに成る",
       schoolName: "北海道滝川西高等学校",
       pageTitle: "卒業への軌跡 ― 旅立ちのカウントダウン",
@@ -666,7 +755,6 @@
         "2027-02-26",
         "2027-02-28"
       ],
-      // 2026/11/20時点で残り登校日数が37日になるよう調整済み
       extraOffDays: [
         "2026-11-25"
       ],
@@ -747,6 +835,10 @@
       document.body.dataset.theme = config.theme || "navy";
       document.getElementById("school-motto").textContent = config.schoolMotto;
       document.getElementById("school-name").textContent = config.schoolName;
+      document.getElementById("maintenance-school").textContent = config.schoolName;
+      document.getElementById("maintenance-message").textContent =
+        config.maintenanceMessage || DEFAULT_CONFIG.maintenanceMessage;
+
       document.getElementById("opening-motto").textContent = config.schoolMotto;
       document.getElementById("opening-school").textContent = config.schoolName;
       document.getElementById("page-title").textContent = config.pageTitle;
@@ -799,6 +891,8 @@
     }
 
     function updateTick() {
+      if (config.maintenanceMode) return;
+
       const now = new Date();
       const [hh, mm] = (config.graduationTime || "10:00").split(":").map(Number);
       const gradDate = parseLocalDate(config.graduationDate);
@@ -836,7 +930,7 @@
     }
 
     function triggerOpeningBurst() {
-      if (isOpened) return;
+      if (isOpened || config.maintenanceMode) return;
       isOpened = true;
 
       const curtain = document.getElementById("opening-curtain");
@@ -875,19 +969,27 @@
       const openingStart = performance.now();
       try {
         const res = await fetch("/api/config", { cache: "no-store" });
-        if (!res.ok) return;
-        const remote = await res.json();
-        if (remote && Object.keys(remote).length > 0) {
-          config = { ...DEFAULT_CONFIG, ...remote };
-          if (remote.updatedAt) {
-            const dt = new Date(remote.updatedAt);
-            document.getElementById("sync-status").textContent =
-              `最終更新: ${dt.toLocaleString("ja-JP")}`;
+        if (res.ok) {
+          const remote = await res.json();
+          if (remote && Object.keys(remote).length > 0) {
+            config = { ...DEFAULT_CONFIG, ...remote };
+            if (remote.updatedAt) {
+              const dt = new Date(remote.updatedAt);
+              document.getElementById("sync-status").textContent =
+                `最終更新: ${dt.toLocaleString("ja-JP")}`;
+            }
           }
         }
       } catch (_) {
       } finally {
         applyConfigToDOM();
+
+        if (config.maintenanceMode) {
+          document.body.classList.add("is-maintenance");
+          document.getElementById("petal-canvas").style.zIndex = "0";
+          return;
+        }
+
         updateTick();
         const elapsed = performance.now() - openingStart;
         const waitMs = Math.max(400, 3000 - elapsed);
