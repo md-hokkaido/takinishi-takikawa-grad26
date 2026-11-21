@@ -321,7 +321,7 @@
       z-index: 1;
       max-width: 960px;
       margin: 0 auto;
-      padding: 48px 20px 32px;
+      padding: 24px 20px 32px;
       transform: scale(0.96);
       opacity: 0;
       transition: transform 0.95s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s ease;
@@ -348,6 +348,54 @@
     body.is-revealed .delay-3 { transition-delay: 0.24s; }
     body.is-revealed .delay-4 { transition-delay: 0.32s; }
     body.is-revealed .delay-5 { transition-delay: 0.40s; }
+
+    /* 右上の日本標準時（JST）表示バー */
+    .jst-top-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 20px;
+    }
+
+    .jst-clock-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 99px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.32);
+      font-family: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--gold-light);
+      letter-spacing: 0.03em;
+    }
+
+    .jst-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 8px var(--gold);
+      animation: pulseDot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    .jst-tag {
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      padding-left: 4px;
+      border-left: 1px solid rgba(212, 175, 55, 0.3);
+    }
 
     header {
       text-align: center;
@@ -465,13 +513,13 @@
     }
 
     .stat-asof {
-      margin-top: 6px;
+      margin-top: 8px;
       font-size: 0.78rem;
       color: var(--gold-light);
       background: rgba(212, 175, 55, 0.14);
       border: 1px solid rgba(212, 175, 55, 0.3);
       display: inline-block;
-      padding: 2px 10px;
+      padding: 2px 12px;
       border-radius: 99px;
     }
 
@@ -837,6 +885,15 @@
   <canvas id="petal-canvas"></canvas>
 
   <div class="wrapper">
+    <!-- 右上の日本標準時（JST）表示 -->
+    <div class="jst-top-bar reveal-item delay-1">
+      <div class="jst-clock-pill" title="日本標準時（NICT JST基準）">
+        <span class="jst-dot"></span>
+        <span id="jst-now-text">----/--/--(-) --:--:--</span>
+        <span class="jst-tag">JST</span>
+      </div>
+    </div>
+
     <header class="reveal-item delay-1">
       <div class="school-motto" id="school-motto">志あるものは事ついに成る</div>
       <div class="school-name" id="school-name">北海道滝川西高等学校</div>
@@ -992,6 +1049,56 @@
     let config = structuredClone(DEFAULT_CONFIG);
     let burstParticles = [];
     let isOpened = false;
+    let jstOffsetMs = 0; // NICT日本標準時とローカル端末時計の差分（ミリ秒）
+
+    // NICT（情報通信研究機構）の日本標準時APIと同期して時刻オフセットを取得
+    async function syncNictJst() {
+      try {
+        const t0 = performance.now();
+        const res = await fetch("https://ntp-a1.nict.go.jp/cgi-bin/json", { cache: "no-store" });
+        const t1 = performance.now();
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && typeof data.st === "number") {
+          const rttHalf = (t1 - t0) / 2;
+          const serverEpochMs = data.st * 1000 + rttHalf;
+          jstOffsetMs = serverEpochMs - Date.now();
+        }
+      } catch (_) {
+        // ネットワーク制限等がある場合はローカル時計のJST換算を使用
+      }
+    }
+
+    // 補正済みの現在の日本標準時（JST）の各要素を取得
+    function getCurrentJstParts() {
+      const correctedEpoch = Date.now() + jstOffsetMs;
+      const jstVirtual = new Date(correctedEpoch + 9 * 3600 * 1000);
+      return {
+        year: jstVirtual.getUTCFullYear(),
+        month: jstVirtual.getUTCMonth() + 1,
+        day: jstVirtual.getUTCDate(),
+        dow: jstVirtual.getUTCDay(),
+        hour: jstVirtual.getUTCHours(),
+        min: jstVirtual.getUTCMinutes(),
+        sec: jstVirtual.getUTCSeconds(),
+        localDateObj: new Date(
+          jstVirtual.getUTCFullYear(),
+          jstVirtual.getUTCMonth(),
+          jstVirtual.getUTCDate(),
+          jstVirtual.getUTCHours(),
+          jstVirtual.getUTCMinutes(),
+          jstVirtual.getUTCSeconds()
+        )
+      };
+    }
+
+    function updateTopJstClock() {
+      const p = getCurrentJstParts();
+      const weeks = ["日", "月", "火", "水", "木", "金", "土"];
+      const dateStr = `${p.year}/${String(p.month).padStart(2, "0")}/${String(p.day).padStart(2, "0")}(${weeks[p.dow]})`;
+      const timeStr = `${String(p.hour).padStart(2, "0")}:${String(p.min).padStart(2, "0")}:${String(p.sec).padStart(2, "0")}`;
+      document.getElementById("jst-now-text").textContent = `${dateStr} ${timeStr}`;
+    }
 
     function parseLocalDate(str) {
       const [y, m, d] = str.split("-").map(Number);
@@ -1031,7 +1138,6 @@
       return true;
     }
 
-    // 休日・長期休業の場合は直近の登校日を基準日として日数を算出する
     function getSchoolDayStatus(now) {
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const grad = parseLocalDate(config.graduationDate);
@@ -1045,7 +1151,6 @@
       let baseDate = new Date(today);
 
       if (!isTodaySchool) {
-        // 直近の登校日まで遡る（例: 2026/11/21(土) → 2026/11/20(金)）
         while (baseDate > start && !isSchoolDay(baseDate)) {
           baseDate.setDate(baseDate.getDate() - 1);
         }
@@ -1136,7 +1241,7 @@
 
       const listEl = document.getElementById("event-list");
       listEl.innerHTML = "";
-      const todayYMD = formatYMD(new Date());
+      const todayYMD = formatYMD(getCurrentJstParts().localDateObj);
 
       const normalized = config.milestones.map(normalizeMilestone);
       const sorted = normalized.sort((a, b) => a.startDate.localeCompare(b.startDate));
@@ -1179,9 +1284,10 @@
     }
 
     function updateTick() {
+      updateTopJstClock();
       if (config.maintenanceMode) return;
 
-      const now = new Date();
+      const now = getCurrentJstParts().localDateObj;
       const [hh, mm] = (config.graduationTime || "10:00").split(":").map(Number);
       const gradDate = parseLocalDate(config.graduationDate);
       gradDate.setHours(hh, mm, 0, 0);
@@ -1211,7 +1317,7 @@
         const schoolStatus = getSchoolDayStatus(now);
         document.getElementById("school-days-left").textContent = schoolStatus.count;
         asofEl.textContent = schoolStatus.isHoliday
-          ? `休校日のため ${formatJPDateFromObj(schoolStatus.baseDate)} 時点`
+          ? `${formatJPDateFromObj(schoolStatus.baseDate)}時点`
           : "";
       }
 
@@ -1263,6 +1369,7 @@
 
     async function loadRemoteConfig() {
       const openingStart = performance.now();
+      await syncNictJst();
       try {
         const res = await fetch("/api/config", { cache: "no-store" });
         if (res.ok) {
@@ -1376,6 +1483,7 @@
     initCanvas();
     loadRemoteConfig();
     setInterval(updateTick, 1000);
+    setInterval(syncNictJst, 5 * 60 * 1000);
   </script>
 </body>
 </html>
